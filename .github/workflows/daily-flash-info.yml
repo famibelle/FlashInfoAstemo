@@ -44,14 +44,8 @@ jobs:
           ARCHIVE_ACCESS_KEY: ${{ secrets.ARCHIVE_ACCESS_KEY }}
           ARCHIVE_SECRET_KEY: ${{ secrets.ARCHIVE_SECRET_KEY }}
         run: |
-          # Générer le flash info pour l'édition du matin
+          # Générer le flash info pour l'édition du matin uniquement
           python flash-info-astemo.py --edition matin --output docs/audio/flash-info-matin.mp3
-          
-          # Générer le flash info pour l'édition du midi
-          python flash-info-astemo.py --edition midi --output docs/audio/flash-info-midi.mp3
-          
-          # Générer le flash info pour l'édition du soir
-          python flash-info-astemo.py --edition soir --output docs/audio/flash-info-soir.mp3
           
       - name: Commit and push audio files
         env:
