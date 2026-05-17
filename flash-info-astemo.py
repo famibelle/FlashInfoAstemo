@@ -868,7 +868,9 @@ def _normalize_for_tts(text: str) -> str:
 
 
 def _tts_call(text: str, output_path: Path, voice_id: str = TTS_VOICE_DEFAULT) -> None:
-
+    """Appelle l'API TTS Mistral avec retry exponentiel (4s, 8s, 16s, 32s)."""
+    import time
+    
     payload = json.dumps({
         "input": text,
         "model": TTS_MODEL,
@@ -883,17 +885,31 @@ def _tts_call(text: str, output_path: Path, voice_id: str = TTS_VOICE_DEFAULT) -
             "Content-Type": "application/json",
         },
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        response = json.loads(r.read())
-    if "audio_data" not in response:
-        raise RuntimeError(f"TTS error: {response}")
     
-    # Assurez-vous que output_path est un Path
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)  # Crée le répertoire parent s'il n'existe pas
-    output_path.write_bytes(base64.b64decode(response["audio_data"]))
-
-    output_path.write_bytes(base64.b64decode(response["audio_data"]))
+    delays = [4, 8, 16, 32]  # Délais de retry en secondes
+    last_error = None
+    
+    for attempt in range(len(delays) + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                response = json.loads(r.read())
+            if "audio_data" not in response:
+                raise RuntimeError(f"TTS error: {response}")
+            
+            # Assurez-vous que output_path est un Path
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_bytes(base64.b64decode(response["audio_data"]))
+            return  # Succès, sort de la fonction
+            
+        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+            last_error = e
+            if attempt < len(delays):
+                delay = delays[attempt]
+                print(f"   ⏳ TTS échoué (attempt {attempt + 1}/{len(delays) + 1}) — retry dans {delay}s...")
+                time.sleep(delay)
+            else:
+                raise RuntimeError(f"TTS échoué après {len(delays) + 1} tentatives: {last_error}") from last_error
 
 
 def resolve_stinger(name: str | None) -> Path:

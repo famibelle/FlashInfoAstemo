@@ -3,9 +3,23 @@
 
 import os
 import sys
+import subprocess
 import runpy
 from pathlib import Path
 from datetime import datetime
+
+
+def get_audio_duration(audio_path: Path) -> float:
+    """Récupère la durée du fichier audio en secondes via ffprobe."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", str(audio_path)],
+            capture_output=True, text=True, timeout=10
+        )
+        return float(result.stdout.strip())
+    except Exception:
+        return 0.0
 
 # Ajouter le répertoire parent au path pour que data/ soit accessible
 project_root = Path(__file__).parent.parent
@@ -33,6 +47,10 @@ def main():
         print(f'ERREUR: Fichier non trouvé: {file_path}')
         sys.exit(1)
     
+    # Calculer la durée du fichier audio
+    duration_s = get_audio_duration(file_path)
+    print(f"⏱️  Durée audio : {duration_s:.1f}s")
+    
     _update_podcast_rss(
         rss_path=Path('docs/podcast.xml'),
         channel_title='L\'actualité du Freinage',
@@ -41,7 +59,7 @@ def main():
         episode_desc=f'{teaser}',
         audio_url=audio_url,
         audio_size=file_path.stat().st_size,
-        duration_s=0,
+        duration_s=duration_s,
         guid=f'flash-info-astemo-{date_str}-matin',
         pub_date=now,
     )
