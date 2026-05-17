@@ -1,7 +1,7 @@
 #!/home/medhi/SourceCode/KreyolKeyb/.venv/bin/python3
 """
 Flash info Guadeloupe — workflow complet
-Collecte RSS → Script → Audio TTS (Voxtral) → Envoi Telegram
+Collecte RSS → Script → Audio TTS (Voxtral) → Publication Buzzsprout
 """
 
 import os
@@ -46,7 +46,7 @@ _load_env(Path(__file__).parent / ".env")
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-from private.data.sources import RSS_FEEDS, RSS_SOURCES
+from data.sources import RSS_FEEDS, RSS_SOURCES
 
 _FEED_CATEGORY: dict[str, str] = {s.url: s.category for s in RSS_SOURCES}
 MAX_ITEMS      = 7     # 7 sujets → ~2m-2m30 audio
@@ -68,9 +68,6 @@ TTS_VOICES = {
     "curious":  "fr_marie_curious",
 }
 
-TELEGRAM_BOT_TOKEN  = os.environ["TELEGRAM_BOT_TOKEN"]
-TELEGRAM_CHAT_ID    = os.environ["TELEGRAM_CHAT_ID"]
-
 BUZZSPROUT_API_TOKEN  = os.environ.get("BUZZSPROUT_API_TOKEN", "")
 BUZZSPROUT_PODCAST_ID = os.environ.get("BUZZSPROUT_PODCAST_ID", "")
 
@@ -78,19 +75,6 @@ X_API_KEY            = os.environ.get("X_API_KEY", "")
 X_API_SECRET         = os.environ.get("X_API_SECRET", "")
 X_ACCESS_TOKEN       = os.environ.get("X_ACCESS_TOKEN", "")
 X_ACCESS_TOKEN_SECRET = os.environ.get("X_ACCESS_TOKEN_SECRET", "")
-
-YOUTUBE_CLIENT_ID     = os.environ.get("YOUTUBE_CLIENT_ID", "")
-YOUTUBE_CLIENT_SECRET = os.environ.get("YOUTUBE_CLIENT_SECRET", "")
-YOUTUBE_REFRESH_TOKEN = os.environ.get("YOUTUBE_REFRESH_TOKEN", "")
-
-LINKEDIN_ACCESS_TOKEN  = os.environ.get("LINKEDIN_ACCESS_TOKEN", "")
-LINKEDIN_REFRESH_TOKEN = os.environ.get("LINKEDIN_REFRESH_TOKEN", "")
-LINKEDIN_CLIENT_ID     = os.environ.get("LINKEDIN_CLIENT_ID", "")
-LINKEDIN_CLIENT_SECRET = os.environ.get("LINKEDIN_CLIENT_SECRET", "")
-LINKEDIN_PERSON_ID     = os.environ.get("LINKEDIN_PERSON_ID", "")
-
-INSTAGRAM_ACCESS_TOKEN = os.environ.get("INSTAGRAM_ACCESS_TOKEN", "")
-INSTAGRAM_USER_ID      = os.environ.get("INSTAGRAM_USER_ID", "")
 
 OPENAI_API_KEY  = os.environ.get("OPENAI_API_KEY", "")
 
@@ -107,7 +91,7 @@ GITHUB_REPO      = "famibelle/FlashInfoKarukera"
 
 OUTPUT_DIR      = Path(tempfile.gettempdir()) / "flash_info_output"
 STINGERS_DIR    = Path(__file__).parent / "Stingers"
-PROMPTS_DIR     = Path(__file__).parent / "private" / "prompts"
+PROMPTS_DIR     = Path(__file__).parent / "prompts"
 MEDIA_DIR       = Path(__file__).parent / "Media"
 DATA_DIR        = Path(__file__).parent / "data"
 ARCHIVES_DIR    = Path(__file__).parent / "archives" / "flash-info"
@@ -1384,351 +1368,6 @@ def transcribe_with_words(audio_path: Path) -> list[dict]:
     ]
 
 
-# ── Étape 3c : Vidéos TikTok par segment ─────────────────────────────────────
-
-TIKTOK_COLORS = {
-    "neutral":  "#FFFFFF",
-    "happy":    "#FFD700",
-    "excited":  "#FF4500",
-    "sad":      "#6495ED",
-    "angry":    "#FF0000",
-    "curious":  "#00CED1",
-}
-
-INTERSTITIAL_DURATION     = 2.5   # secondes
-INTERSTITIAL_HT_FONTSIZE  = 110   # taille des hashtags dans l'interstitiel
-INTERSTITIAL_CAT_FONTSIZE = 170   # taille du texte catégorie dans l'interstitiel
-
-SUBTITLE_FONTSIZE  = 130    # taille du mot courant dans les sous-titres karaoke
-TRIM_SILENCE       = False  # coupe le silence de fin TTS (deux passes FFmpeg, plus lent)
-
-INTERSTITIAL_CTA          = "Si j'ai mal prononcé certains mots, dites-le moi en commentaire"
-INTERSTITIAL_CTA_DURATION = 5.0  # secondes (texte long à lire)
-
-# Mapping catégorie → (label affiché, couleur hex)
-INTERSTITIAL_STYLES: dict[str, tuple[str, str]] = {
-    "météo":        ("🌤  MÉTÉO",         "#4A90D9"),
-    "prenom":       ("🎂 BONNE FÊTE",     "#E91E8C"),
-    "horoscope":    ("HOROSCOPE",         "#6C3483"),
-    "vie locale":   ("🏘  VIE LOCALE",    "#2ECC71"),
-    "sports":       ("⚽ SPORTS",        "#FF6B00"),
-    "social":       ("🤝 SOCIAL",        "#9B59B6"),
-    "politique":    ("🏛  POLITIQUE",     "#E74C3C"),
-    "economie":     ("💼 ÉCONOMIE",      "#F39C12"),
-    "environement": ("🌿 ENVIRONNEMENT", "#27AE60"),
-    "en bref":      ("📰 EN BREF",       "#1ABC9C"),
-    "general":      ("📡 ACTUALITÉS",    "#95A5A6"),
-    "custom":       ("🎙  FLASH INFO",    "#FFFFFF"),
-}
-
-
-def _ass_time(s: float) -> str:
-    h = int(s // 3600)
-    m = int((s % 3600) // 60)
-    sec = s % 60
-    return f"{h}:{m:02d}:{sec:05.2f}"
-
-
-def _ass_color(hex_color: str) -> str:
-    """#RRGGBB → &H00BBGGRR& (ordre canaux ASS)."""
-    h = hex_color.lstrip("#")
-    r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
-    return f"&H00{b:02X}{g:02X}{r:02X}&"
-
-
-_FONT_BOLD    = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-_FONT_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-
-
-def _make_interstitial(
-    category: str, output_path: Path, stinger: Path,
-    hashtags: list[str] | None = None,
-    subtitle: str | None = None,
-) -> Path:
-    """Génère un MP4 interstitiel 1080×1920, durée et audio calés sur le stinger."""
-    label, color = INTERSTITIAL_STYLES.get(category, INTERSTITIAL_STYLES["general"])
-    color_hex = color.lstrip("#")
-    duration = _stinger_duration(stinger)
-    parts = label.split(" ", 1)
-    text = parts[1] if len(parts) == 2 else parts[0]
-    tmp = output_path.parent
-
-    # ── Tailles de police adaptatives ──
-    _MAX_PX          = 920   # largeur max utilisable (marges de 80px de chaque côté)
-    _CHAR_RATIO_UPPER = 0.72  # majuscules DejaVu Bold (plus larges qu'estimé à 0.65)
-    _CHAR_RATIO_MIXED = 0.60  # casse mixte (hashtags)
-
-    # Catégorie : réduction si le texte est trop long
-    cat_fontsize = min(INTERSTITIAL_CAT_FONTSIZE, int(_MAX_PX / (max(len(text), 1) * _CHAR_RATIO_UPPER)))
-    cat_line_h   = round(cat_fontsize * 1.1)
-
-    # Hashtags : réduction si le hashtag le plus long dépasse la largeur
-    max_ht_len  = max((len(h) for h in (hashtags or [])), default=10)
-    ht_fontsize = min(INTERSTITIAL_HT_FONTSIZE, int(_MAX_PX / (max_ht_len * _CHAR_RATIO_MIXED)))
-    ht_line_h   = round(ht_fontsize * 1.3)
-    ht_wrap     = max(6, int(_MAX_PX / (ht_fontsize * _CHAR_RATIO_MIXED)))
-
-    ht_files: list[Path] = []
-    if hashtags:
-        words, lines, current = hashtags[:], [], ""
-        for w in words:
-            candidate = f"{current} {w}".strip()
-            if len(candidate) <= ht_wrap:
-                current = candidate
-            else:
-                if current:
-                    lines.append(current)
-                current = w
-        if current:
-            lines.append(current)
-        for i, line in enumerate(lines):
-            f = tmp / f"inter_ht_{output_path.stem}_{i}.txt"
-            f.write_text(line, encoding="utf-8")
-            ht_files.append(f)
-
-    # ── Layout vertical centré ──
-    n_ht = len(ht_files)
-    gap  = 70 if n_ht > 0 else 0
-    block_h   = n_ht * ht_line_h + gap + cat_line_h
-    ht_y_start = (1920 - block_h) // 2
-    cat_y      = ht_y_start + n_ht * ht_line_h + gap
-    wm_y       = cat_y + cat_line_h + 50
-
-    filter_parts = [f"color=c=black:s=1080x1920:r=24:d={duration}"]
-    for i, f in enumerate(ht_files):
-        y = ht_y_start + i * ht_line_h
-        filter_parts.append(
-            f"drawtext=textfile={f}:fontsize={ht_fontsize}:fontcolor=0x{color_hex}:"
-            f"fontfile={_FONT_BOLD}:x=(w-tw)/2:y={y}:"
-            f"shadowcolor=black@0.6:shadowx=2:shadowy=2"
-        )
-    filter_parts.append(
-        f"drawtext=text='{text}':"
-        f"fontsize={cat_fontsize}:fontcolor=0x{color_hex}:fontfile={_FONT_BOLD}:"
-        f"x=(w-tw)/2:y={cat_y}:"
-        f"shadowcolor=black@0.6:shadowx=3:shadowy=3"
-    )
-    if subtitle:
-        sub_fontsize = min(72, int(_MAX_PX / (max(len(subtitle), 1) * _CHAR_RATIO_MIXED)))
-        sub_y = cat_y + cat_line_h + 30
-        sub_file = tmp / f"inter_sub_{output_path.stem}.txt"
-        sub_file.write_text(subtitle, encoding="utf-8")
-        filter_parts.append(
-            f"drawtext=textfile={sub_file}:"
-            f"fontsize={sub_fontsize}:fontcolor=white:fontfile={_FONT_REGULAR}:"
-            f"x=(w-tw)/2:y={sub_y}:"
-            f"shadowcolor=black@0.5:shadowx=2:shadowy=2"
-        )
-        wm_y = sub_y + round(sub_fontsize * 1.2) + 30
-    filter_parts.append(
-        f"drawtext=text='Flash Info Karukera par @Botiran':"
-        f"fontsize=38:fontcolor=white@0.5:fontfile={_FONT_REGULAR}:"
-        f"x=(w-tw)/2:y={wm_y}"
-    )
-    filter_v = ",".join(filter_parts)
-
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-f", "lavfi", "-i", filter_v,
-        "-i", str(stinger),
-        "-c:v", "libx264", "-preset", "medium", "-crf", "28",
-        "-c:a", "aac", "-b:a", "192k",
-        "-shortest",
-        str(output_path),
-    ], capture_output=True)
-    for f in ht_files:
-        f.unlink(missing_ok=True)
-    if subtitle:
-        sub_file.unlink(missing_ok=True)
-    if proc.returncode != 0:
-        raise RuntimeError(f"ffmpeg interstitiel error: {proc.stderr.decode()}")
-    return output_path
-
-
-def _make_cta_interstitial(output_path: Path, stinger: Path) -> Path:
-    """Génère un MP4 de clôture avec le call-to-action INTERSTITIAL_CTA."""
-    cta_text = INTERSTITIAL_CTA.rstrip().rstrip("👇").rstrip()
-    duration = _stinger_duration(stinger)
-
-    # Word-wrap : max ~20 caractères par ligne pour tenir dans 1080px à fontsize=62
-    words = cta_text.split()
-    lines, current = [], ""
-    for word in words:
-        candidate = f"{current} {word}".strip()
-        if len(candidate) <= 20:
-            current = candidate
-        else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
-
-    # Écrit chaque ligne + le watermark dans des fichiers temporaires
-    tmp = output_path.parent
-    line_files = []
-    for i, line in enumerate(lines):
-        f = tmp / f"cta_line{i}.txt"
-        f.write_text(line, encoding="utf-8")
-        line_files.append(f)
-    wm_file = tmp / "cta_watermark.txt"
-    wm_file.write_text("Flash Info Karukera par Botiran", encoding="utf-8")
-
-    # Centre le bloc de texte verticalement (ligne_height=80px)
-    fontsize   = 62
-    line_h     = 80
-    block_h    = len(lines) * line_h
-    y_start    = (1920 - block_h) // 2 - 40  # légèrement au-dessus du centre
-
-    filter_parts = [
-        f"color=c=black:s=1080x1920:r=24:d={duration}",
-        f"drawbox=x=0:y=0:w=1080:h=1920:color=0x1A1A2E@1:t=fill",
-    ]
-    for i, f in enumerate(line_files):
-        y = y_start + i * line_h
-        filter_parts.append(
-            f"drawtext=textfile={f}:fontsize={fontsize}:fontcolor=white:"
-            f"fontfile={_FONT_BOLD}:x=(w-tw)/2:y={y}:"
-            f"shadowcolor=black@0.6:shadowx=2:shadowy=2"
-        )
-    y_wm = y_start + len(lines) * line_h + 40
-    filter_parts.append(
-        f"drawtext=textfile={wm_file}:fontsize=36:fontcolor=white@0.4:"
-        f"fontfile={_FONT_REGULAR}:x=(w-tw)/2:y={y_wm}"
-    )
-    filter_v = ",".join(filter_parts)
-
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-f", "lavfi", "-i", filter_v,
-        "-i", str(stinger),
-        "-c:v", "libx264", "-preset", "medium", "-crf", "28",
-        "-c:a", "aac", "-b:a", "192k",
-        "-shortest",
-        str(output_path),
-    ], capture_output=True)
-    for f in line_files:
-        f.unlink(missing_ok=True)
-    wm_file.unlink(missing_ok=True)
-    if proc.returncode != 0:
-        raise RuntimeError(f"ffmpeg CTA error: {proc.stderr.decode()}")
-    return output_path
-
-
-def _make_ass(words: list[dict], tone: str) -> str:
-    """Génère un fichier ASS karaoke : mot courant coloré, précédent/suivant atténués."""
-    tone_col = _ass_color(TIKTOK_COLORS.get(tone, "#FFFFFF"))
-    dim_col  = "&H80FFFFFF&"
-
-    header = (
-        "[Script Info]\n"
-        "ScriptType: v4.00+\nPlayResX: 1080\nPlayResY: 1920\nWrapStyle: 1\n\n"
-        "[V4+ Styles]\n"
-        "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, "
-        "OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, "
-        "ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, "
-        "Alignment, MarginL, MarginR, MarginV, Encoding\n"
-        f"Style: Default,Arial,{round(SUBTITLE_FONTSIZE * 0.74)},&H00FFFFFF,&H00FFFFFF,&H00000000,"
-        "&HA0000000,0,0,0,0,100,100,0,0,1,5,2,5,80,80,0,1\n\n"
-        "[Events]\n"
-        "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
-    )
-
-    events = []
-    for i, word in enumerate(words):
-        start = word["start"]
-        end   = max(word["end"], start + 0.05)
-        parts = []
-        fs_curr = SUBTITLE_FONTSIZE
-        fs_adj  = round(SUBTITLE_FONTSIZE * 0.74)
-        if i > 0:
-            parts.append(f"{{\\c{dim_col}\\fs{fs_adj}}}{words[i - 1]['word']}")
-        parts.append(f"{{\\c{tone_col}\\fs{fs_curr}\\b1}}{word['word']}{{\\b0}}")
-        if i < len(words) - 1:
-            parts.append(f"{{\\c{dim_col}\\fs{fs_adj}}}{words[i + 1]['word']}")
-        # \an5 = centré horizontalement et verticalement dans la zone texte
-        # \pos(540,1210) = centre horizontal, milieu de la zone sous le spectre (500px + 710px restants / 2)
-        events.append(
-            f"Dialogue: 0,{_ass_time(start)},{_ass_time(end)},"
-            f"Default,,0,0,0,,{{\\an5\\pos(540,1210)}}{' '.join(parts)}"
-        )
-
-    return header + "\n".join(events) + "\n"
-
-
-def _trim_silence(seg_path: Path) -> Path:
-    """Passe 1 : supprime le silence de fin TTS, retourne un fichier MP3 temporaire."""
-    trimmed = seg_path.with_suffix(".trimmed.mp3")
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-i", str(seg_path),
-        "-af", "silenceremove=stop_periods=-1:stop_duration=0.2:stop_threshold=-45dB",
-        "-c:a", "libmp3lame", "-q:a", "2",
-        str(trimmed),
-    ], capture_output=True)
-    if proc.returncode != 0:
-        raise RuntimeError(f"ffmpeg trim error: {proc.stderr.decode()}")
-    return trimmed
-
-
-def _tiktok_segment_video(seg_path: Path, ass_path: Path, tone: str, output_path: Path) -> None:
-    color_hex = TIKTOK_COLORS.get(tone, "#FFFFFF").lstrip("#")
-    audio_path = _trim_silence(seg_path) if TRIM_SILENCE else seg_path
-    filter_complex = (
-        f"color=c=black:s=1080x1920:r=24[bg];"
-        f"[0:a]showwaves=s=1080x500:mode=cline:colors=0x{color_hex}:scale=sqrt:rate=24[waves];"
-        f"[bg][waves]overlay=0:0[v];"
-        f"[v]ass={ass_path}[vout]"
-    )
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-i", str(audio_path),
-        "-filter_complex", filter_complex,
-        "-map", "[vout]", "-map", "0:a",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "28",
-        "-c:a", "aac", "-b:a", "192k",
-        "-shortest",
-        str(output_path),
-    ], capture_output=True)
-    if TRIM_SILENCE:
-        audio_path.unlink(missing_ok=True)
-    if proc.returncode != 0:
-        raise RuntimeError(f"ffmpeg tiktok error: {proc.stderr.decode()}")
-
-
-def generate_tiktok(
-    seg_paths: list[Path],
-    segments: list[str],
-    tones: list[str],
-    output_dir: Path,
-    has_prenom: bool = False,
-    has_horoscope: bool = False,
-    has_meteo: bool = True,
-) -> list[tuple[int, Path]]:
-    """Retourne [(index_segment, chemin_mp4), …]."""
-    output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"🎬 Génération vidéos : {len(seg_paths)} segments → {output_dir}")
-
-    videos: list[tuple[int, Path]] = []
-    for i, (seg_path, _text, tone) in enumerate(zip(seg_paths, segments, tones)):
-        label = _seg_label(i, len(seg_paths), has_prenom=has_prenom, has_horoscope=has_horoscope, has_meteo=has_meteo)
-        print(f"   [{i + 1}/{len(seg_paths)}] {label} ({tone}) — STT timestamps…")
-
-        words = transcribe_with_words(seg_path)
-        if not words:
-            print(f"   ⚠️  STT sans mots pour le segment {i + 1} — ignoré")
-            continue
-
-        ass_path = output_dir / f"seg_{i:02d}.ass"
-        ass_path.write_text(_make_ass(words, tone), encoding="utf-8")
-
-        video_path = output_dir / f"seg_{i:02d}.mp4"
-        print(f"   [{i + 1}/{len(seg_paths)}] FFmpeg → {video_path.name}…")
-        _tiktok_segment_video(seg_path, ass_path, tone, video_path)
-        videos.append((i, video_path))
-        print(f"   ✅ {video_path.name} ({video_path.stat().st_size:,} bytes)")
-
-    return videos
 
 
 # ── Backblaze B2 ──────────────────────────────────────────────────────────────
@@ -1935,147 +1574,7 @@ def _update_podcast_rss(
     print(f"   📻 RSS mis à jour → {rss_path.name} ({len(existing) + 1} épisodes)")
 
 
-# ── Étape 4 : Envoi Telegram ──────────────────────────────────────────────────
-
-def send_telegram(audio_path: Path, caption: str, reply_to_message_id: int | None = None) -> int | None:
-    print(f"📤 Envoi Telegram audio (chat_id={TELEGRAM_CHAT_ID})...")
-    boundary = "----FlashInfoBoundary"
-
-    def field(name, value):
-        return (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="{name}"\r\n\r\n'
-            f"{value}\r\n"
-        ).encode()
-
-    body = b""
-    body += field("chat_id", TELEGRAM_CHAT_ID)
-    body += field("caption", caption)
-    body += field("title", "Flash info Guadeloupe")
-    body += field("performer", "Botiran")
-    if reply_to_message_id:
-        body += field("reply_to_message_id", str(reply_to_message_id))
-
-    audio_data = audio_path.read_bytes()
-    body += (
-        f"--{boundary}\r\n"
-        f'Content-Disposition: form-data; name="audio"; filename="{audio_path.name}"\r\n'
-        f"Content-Type: audio/mpeg\r\n\r\n"
-    ).encode() + audio_data + b"\r\n"
-    body += f"--{boundary}--\r\n".encode()
-
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendAudio",
-        data=body,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        result = json.loads(r.read())
-
-    if not result.get("ok"):
-        raise RuntimeError(f"Telegram error: {result}")
-    print("   Envoyé ✅")
-    return result.get("result", {}).get("message_id")
-
-
-def send_telegram_photo(photo_path: Path, caption: str = "") -> None:
-    """Envoie une image sur Telegram via sendPhoto."""
-    boundary = "----FlashInfoBoundary"
-    body = (
-        f"--{boundary}\r\n"
-        f'Content-Disposition: form-data; name="chat_id"\r\n\r\n'
-        f"{TELEGRAM_CHAT_ID}\r\n"
-    ).encode()
-    if caption:
-        body += (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="caption"\r\n\r\n'
-            f"{caption}\r\n"
-        ).encode()
-    body += (
-        f"--{boundary}\r\n"
-        f'Content-Disposition: form-data; name="photo"; filename="{photo_path.name}"\r\n'
-        f"Content-Type: image/png\r\n\r\n"
-    ).encode() + photo_path.read_bytes() + b"\r\n"
-    body += f"--{boundary}--\r\n".encode()
-
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto",
-        data=body,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
-    )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        result = json.loads(r.read())
-    if not result.get("ok"):
-        raise RuntimeError(f"Telegram photo error: {result}")
-    print(f"   {photo_path.name} envoyé ✅")
-
-
-TELEGRAM_VIDEO_MAX_MB = 49  # limite Telegram bot API
-
-
-def send_telegram_video(
-    video_path: Path,
-    caption: str,
-    timeout: int = 180,
-    thumbnail_path: "Path | None" = None,
-    reply_to_message_id: int | None = None,
-) -> int | None:
-    size_mb = video_path.stat().st_size / 1_048_576
-    print(f"   Upload Telegram : {video_path.name} ({size_mb:.1f} Mo)…")
-    if size_mb > TELEGRAM_VIDEO_MAX_MB:
-        print(f"   ⚠️  Vidéo trop volumineuse ({size_mb:.1f} Mo > {TELEGRAM_VIDEO_MAX_MB} Mo) — upload ignoré.")
-        return None
-
-    boundary = "----FlashInfoBoundary"
-
-    def field(name, value):
-        return (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="{name}"\r\n\r\n'
-            f"{value}\r\n"
-        ).encode()
-
-    def file_field(name, filename, content_type, data):
-        return (
-            f"--{boundary}\r\n"
-            f'Content-Disposition: form-data; name="{name}"; filename="{filename}"\r\n'
-            f"Content-Type: {content_type}\r\n\r\n"
-        ).encode() + data + b"\r\n"
-
-    body = field("chat_id", TELEGRAM_CHAT_ID) + field("caption", caption)
-    if reply_to_message_id:
-        body += field("reply_to_message_id", str(reply_to_message_id))
-    body += file_field("video", video_path.name, "video/mp4", video_path.read_bytes())
-    if thumbnail_path and thumbnail_path.exists():
-        body += file_field("thumbnail", thumbnail_path.name, "image/png", thumbnail_path.read_bytes())
-    body += f"--{boundary}--\r\n".encode()
-
-    req = urllib.request.Request(
-        f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendVideo",
-        data=body,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
-    )
-
-    for attempt in range(1, 4):
-        try:
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                result = json.loads(r.read())
-            if not result.get("ok"):
-                raise RuntimeError(f"Telegram video error: {result}")
-            print(f"   {video_path.name} envoyé ✅")
-            return result.get("result", {}).get("message_id")
-        except (urllib.error.URLError, ConnectionResetError, TimeoutError) as exc:
-            if attempt < 3:
-                wait = 10 * attempt
-                print(f"   ⚠️  Tentative {attempt}/3 échouée ({exc}) — nouvel essai dans {wait}s…")
-                time.sleep(wait)
-            else:
-                raise
-    return None
-
-
-# ── Étape 5 : Publication Buzzsprout → Spotify ───────────────────────────────
+# ── Étape 4 : Publication Buzzsprout → Spotify ───────────────────────────────
 
 BUZZSPROUT_TAGS = "Guadeloupe, actualité, flash info, Antilles, Caraïbes, France-Antilles, info locale"
 
@@ -2122,784 +1621,7 @@ def publish_buzzsprout(audio_path: Path, title: str, description: str, tags: str
 
     return episode_url, audio_url
 
-
-# ── Étape 6 : Post X/Twitter ─────────────────────────────────────────────────
-
-def post_x(text: str, video_path: "Path | None" = None) -> None:
-    import tweepy
-
-    print("🐦 Post X/Twitter...")
-
-    auth = tweepy.OAuth1UserHandler(
-        X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET
-    )
-    api = tweepy.API(auth, wait_on_rate_limit=True)
-    client = tweepy.Client(
-        consumer_key=X_API_KEY,
-        consumer_secret=X_API_SECRET,
-        access_token=X_ACCESS_TOKEN,
-        access_token_secret=X_ACCESS_TOKEN_SECRET,
-    )
-
-    media_ids = None
-    if video_path:
-        size_mb = video_path.stat().st_size / 1_048_576
-        print(f"   Upload vidéo : {video_path.name} ({size_mb:.1f} Mo)…")
-        media = api.media_upload(
-            filename=str(video_path),
-            media_category="tweet_video",
-            chunked=True,
-        )
-        # Attendre la fin du processing
-        for _ in range(30):
-            status = api.get_media_upload_status(media.media_id)
-            state = status.processing_info.get("state") if hasattr(status, "processing_info") and status.processing_info else "succeeded"
-            if state in ("succeeded", "failed"):
-                break
-            wait = status.processing_info.get("check_after_secs", 5) if status.processing_info else 5
-            print(f"   Processing vidéo ({state})… attente {wait}s")
-            time.sleep(wait)
-        if state == "failed":
-            raise RuntimeError(f"Twitter media processing failed: {status.processing_info}")
-        media_ids = [media.media_id_string]
-        print(f"   Vidéo uploadée ✅  media_id={media.media_id_string}")
-
-    # Tronquer le texte à 280 caractères (Twitter limite)
-    tweet_text = text[:277] + "…" if len(text) > 280 else text
-    response = client.create_tweet(text=tweet_text, media_ids=media_ids)
-    tweet_id = response.data["id"]
-    print(f"   Tweet publié ✅  id={tweet_id}")
-
-
-# ── Descriptions et hashtags par plateforme ──────────────────────────────────
-
-_HASHTAGS_BASE    = "#Guadeloupe #FlashInfo #Karukera #Antilles #Caraïbes"
-_HASHTAGS_METEO   = "#Météo #MétéoGuadeloupe #MétéoAntilles"
-_HASHTAGS_NEWS    = "#Actualités #InfosGuadeloupe #ActuGuadeloupe"
-_HASHTAGS_TIKTOK  = "#GuadeloupeTikTok #InfoTikTok"
-_HASHTAGS_YOUTUBE = "#Shorts #YouTubeShorts"
-
-
-_HASHTAGS_HOROSCOPE = "#Horoscope #AstroGuadeloupe #Zodiaque"
-
-
-def _seg_label(i: int, n: int, has_prenom: bool = False, has_horoscope: bool = False, has_meteo: bool = True) -> str:
-    """Retourne le label lisible d'un segment selon son index (0-based)."""
-    if i == 0:
-        return "INTRO"
-    _k = 0
-    prenom_idx = horoscope_idx = meteo_idx = None
-    if has_prenom:
-        _k += 1; prenom_idx = _k
-    if has_meteo:
-        _k += 1; meteo_idx = _k
-    if has_horoscope:
-        _k += 1; horoscope_idx = _k
-    news_start = _k + 1
-    if prenom_idx is not None and i == prenom_idx:
-        return "BONNE FÊTE"
-    if meteo_idx is not None and i == meteo_idx:
-        return "MÉTÉO"
-    if horoscope_idx is not None and i == horoscope_idx:
-        return "HOROSCOPE"
-    if i == n - 1:
-        return "OUTRO"
-    return f"SUJET {i - news_start + 1}"
-
-
-def _video_label(idx: int, n_segments: int) -> str:
-    if idx == 1:
-        return "météo"
-    if idx == 2:
-        return "horoscope"
-    return f"sujet {idx - 2}"
-
-
-def _tiktok_caption(text: str, idx: int, n_segments: int, date_str: str) -> str:
-    """Caption courte pour TikTok : accroche + hashtags (~300 car.)."""
-    is_meteo     = idx == 1
-    is_horoscope = idx == 2
-    first_sentence = text.split(".")[0].strip()
-    if len(first_sentence) > 120:
-        first_sentence = first_sentence[:117] + "…"
-    if is_meteo:
-        topic_tags = _HASHTAGS_METEO
-        label = "Météo Guadeloupe"
-    elif is_horoscope:
-        topic_tags = _HASHTAGS_HOROSCOPE
-        label = "Horoscope du jour"
-    else:
-        topic_tags = _HASHTAGS_NEWS
-        label = f"Flash Info — {date_str}"
-    return (
-        f"🇬🇵 {label}\n"
-        f"{first_sentence}.\n\n"
-        f"{_HASHTAGS_BASE} {topic_tags} {_HASHTAGS_TIKTOK}"
-    )
-
-
-def _youtube_description(text: str, idx: int, n_segments: int, date_str: str) -> str:
-    """Description YouTube Shorts : extrait + hashtags."""
-    is_meteo     = idx == 1
-    is_horoscope = idx == 2
-    excerpt = text[:400].rsplit(" ", 1)[0] + "…" if len(text) > 400 else text
-    if is_meteo:
-        topic_tags = _HASHTAGS_METEO
-        label = "Météo"
-    elif is_horoscope:
-        topic_tags = _HASHTAGS_HOROSCOPE
-        label = "Horoscope"
-    else:
-        topic_tags = _HASHTAGS_NEWS
-        label = f"Sujet {idx - 2}"
-    return (
-        f"Flash Info Guadeloupe — {date_str} — {label}\n\n"
-        f"{excerpt}\n\n"
-        f"{_HASHTAGS_BASE} {topic_tags} {_HASHTAGS_YOUTUBE}"
-    )
-
-
-# ── Étape 7 : Publication YouTube Shorts ─────────────────────────────────────
-
-YOUTUBE_SCOPES       = ["https://www.googleapis.com/auth/youtube.upload"]
-YOUTUBE_TAGS         = ["Guadeloupe", "flash info", "actualité", "Antilles", "Caraïbes", "Karukera", "météo", "Shorts"]
-YOUTUBE_CATEGORY_ID  = "25"  # News & Politics
-
-
-def _save_refresh_token(token: str) -> None:
-    env_path = Path(__file__).parent / ".env"
-    lines = env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []
-    for i, line in enumerate(lines):
-        if line.startswith("YOUTUBE_REFRESH_TOKEN="):
-            lines[i] = f"YOUTUBE_REFRESH_TOKEN={token}"
-            break
-    else:
-        lines.append(f"YOUTUBE_REFRESH_TOKEN={token}")
-    env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print("   Refresh token sauvegardé dans .env")
-
-
-def _youtube_credentials():
-    from google.oauth2.credentials import Credentials
-    from google.auth.transport.requests import Request as GoogleRequest
-    from google_auth_oauthlib.flow import InstalledAppFlow
-
-    client_config = {
-        "installed": {
-            "client_id": YOUTUBE_CLIENT_ID,
-            "client_secret": YOUTUBE_CLIENT_SECRET,
-            "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"],
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-        }
-    }
-
-    if YOUTUBE_REFRESH_TOKEN:
-        creds = Credentials(
-            token=None,
-            refresh_token=YOUTUBE_REFRESH_TOKEN,
-            token_uri="https://oauth2.googleapis.com/token",
-            client_id=YOUTUBE_CLIENT_ID,
-            client_secret=YOUTUBE_CLIENT_SECRET,
-            scopes=YOUTUBE_SCOPES,
-        )
-        creds.refresh(GoogleRequest())
-        return creds
-
-    flow = InstalledAppFlow.from_client_config(client_config, YOUTUBE_SCOPES)
-    creds = flow.run_local_server(port=0)
-    _save_refresh_token(creds.refresh_token)
-    return creds
-
-
-def upload_youtube_short(video_path: Path, title: str, description: str) -> str:
-    from googleapiclient.discovery import build
-    from googleapiclient.http import MediaFileUpload
-
-    print(f"   ▶️  Upload : {video_path.name}…")
-    creds = _youtube_credentials()
-    youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
-
-    body = {
-        "snippet": {
-            "title": f"{title} #Shorts",
-            "description": description,
-            "tags": YOUTUBE_TAGS,
-            "categoryId": YOUTUBE_CATEGORY_ID,
-        },
-        "status": {
-            "privacyStatus": "public",
-            "selfDeclaredMadeForKids": False,
-        },
-    }
-    media = MediaFileUpload(str(video_path), mimetype="video/mp4", resumable=True)
-    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
-
-    from googleapiclient.errors import ResumableUploadError
-    try:
-        response = None
-        while response is None:
-            _, response = request.next_chunk()
-    except ResumableUploadError as e:
-        if "uploadLimitExceeded" in str(e):
-            print(f"   ⚠️  Quota YouTube dépassé : limite journalière d'uploads atteinte — vidéo ignorée.")
-            return ""
-        raise
-
-    url = f"https://youtube.com/shorts/{response['id']}"
-    print(f"   ✅ {url}")
     return url
-
-
-def _stinger_duration(stinger: Path) -> float:
-    """Retourne la durée du stinger en secondes via ffprobe."""
-    proc = subprocess.run([
-        "ffprobe", "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
-        str(stinger),
-    ], capture_output=True, text=True)
-    return float(proc.stdout.strip())
-
-
-def _build_srt(pairs: "list[tuple[str | None, float]]", words_per_line: int = 12) -> str:
-    """Génère un fichier SRT depuis (texte_ou_None, durée_s). Découpe en chunks lisibles."""
-    def _ts(s: float) -> str:
-        h, rem = divmod(s, 3600)
-        m, s = divmod(rem, 60)
-        return f"{int(h):02d}:{int(m):02d}:{s:06.3f}".replace(".", ",")
-    lines, t, n = [], 0.0, 1
-    for text, dur in pairs:
-        if text and text.strip():
-            words = text.strip().split()
-            chunks = [words[i:i + words_per_line] for i in range(0, len(words), words_per_line)]
-            chunk_dur = dur / len(chunks)
-            for j, chunk in enumerate(chunks):
-                cs = t + j * chunk_dur
-                ce = cs + chunk_dur
-                lines += [str(n), f"{_ts(cs)} --> {_ts(ce)}", " ".join(chunk), ""]
-                n += 1
-        t += dur
-    return "\n".join(lines)
-
-
-def _interleave_interstitials(
-    videos: list[tuple[int, Path]],
-    items: list[dict],
-    output_dir: Path,
-    stinger: Path,
-    has_prenom: bool = False,
-    has_horoscope: bool = False,
-    has_meteo: bool = True,
-    horoscope_signs: list[str] | None = None,
-    prenoms_du_jour: list[str] | None = None,
-) -> list[Path]:
-    """Intercale un interstitiel avant chaque segment de contenu."""
-    _k = 0
-    prenom_idx = horoscope_idx = meteo_idx = None
-    if has_prenom:
-        _k += 1; prenom_idx = _k
-    if has_meteo:
-        _k += 1; meteo_idx = _k
-    if has_horoscope:
-        _k += 1; horoscope_idx = _k
-    news_start = _k + 1
-
-    result: list[Path] = []
-    for idx, video_path in videos:
-        if idx == 0:
-            result.append(video_path)
-            continue
-
-        if prenom_idx is not None and idx == prenom_idx:
-            category = "prenom"
-        elif meteo_idx is not None and idx == meteo_idx:
-            category = "météo"
-        elif horoscope_idx is not None and idx == horoscope_idx:
-            category = "horoscope"
-        elif idx - news_start < len(items):
-            category = items[idx - news_start].get("category", "general")
-        else:
-            category = "general"
-
-        inter_path = output_dir / f"inter_{idx:02d}_{category.replace(' ', '_')}.mp4"
-        if horoscope_idx is not None and idx == horoscope_idx:
-            sign_tags = [f"#{s}" for s in (horoscope_signs or [])]
-            hashtags = ["#Horoscope", "#Zodiaque", "#AstroGuadeloupe"] + sign_tags
-        elif idx >= news_start and idx - news_start < len(items):
-            hashtags = items[idx - news_start].get("hashtags", [])
-        else:
-            hashtags = []
-        subtitle = " & ".join(prenoms_du_jour) if (category == "prenom" and prenoms_du_jour) else None
-        print(f"   Interstitiel [{idx}] — {category} {hashtags[:2]}")
-        _make_interstitial(category, inter_path, stinger, hashtags, subtitle=subtitle)
-        result.append(inter_path)
-        result.append(video_path)
-
-    cta_path = output_dir / "inter_cta.mp4"
-    print("   Interstitiel CTA — clôture")
-    _make_cta_interstitial(cta_path, stinger)
-    result.append(cta_path)
-
-    return result
-
-
-def generate_thumbnail(
-    intro_text: str, target_date: "Date", output_dir: Path,
-    hashtags: list[str] | None = None, verbose: bool = False
-) -> "Path | None":
-    """Génère une illustration verticale via OpenAI gpt-image-2 à partir du texte d'intro."""
-    if not OPENAI_API_KEY:
-        print("   ⚠️  OPENAI_API_KEY absent — thumbnail ignoré.")
-        return None
-    if not BOTIRAN_PROFILE.exists():
-        print(f"   ⚠️  Image de référence introuvable : {BOTIRAN_PROFILE} — thumbnail ignoré.")
-        return None
-    try:
-        from openai import OpenAI
-    except ImportError:
-        print("   ⚠️  Package 'openai' non installé — thumbnail ignoré.")
-        return None
-
-    hashtags_str = ""
-    if hashtags:
-        sample = random.sample(hashtags, min(5, len(hashtags)))
-        hashtags_str = " Thèmes clés : " + " ".join(sample) + "."
-    prompt = (
-        "Inspire-toi de l'image d'origine pour créer une illustration verticale au style "
-        "journalistique pour un flash info audio de Guadeloupe. "
-        f"Résumé du flash info : {intro_text[:600]}"
-        f"{hashtags_str}"
-    )
-    print("🖼️  Génération thumbnail via OpenAI gpt-image-2…")
-    if verbose:
-        print("── Prompt thumbnail ─────────────────────────────────────")
-        print(prompt)
-        print("─────────────────────────────────────────────────────────")
-    # dall-e-2 n'accepte que du PNG — conversion via FFmpeg si nécessaire
-    profile_png = OUTPUT_DIR / "botiran_profile_ref.png"
-    if BOTIRAN_PROFILE.suffix.lower() != ".png" or not profile_png.exists():
-        subprocess.run([
-            "ffmpeg", "-y", "-loglevel", "error",
-            "-i", str(BOTIRAN_PROFILE),
-            str(profile_png),
-        ], check=True)
-    try:
-        from openai import BadRequestError
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        result = client.images.edit(
-            model="gpt-image-1.5",
-            image=[open(str(profile_png), "rb")],
-            prompt=prompt,
-            size="1024x1536",
-            quality="low",
-            input_fidelity="high",
-        )
-        image_bytes = base64.b64decode(result.data[0].b64_json)
-        thumbnail_path = output_dir / f"thumbnail-{target_date}.png"
-        thumbnail_path.write_bytes(image_bytes)
-        print(f"   Thumbnail : {thumbnail_path} ({len(image_bytes) // 1024} Ko)")
-        return thumbnail_path
-    except BadRequestError as e:
-        default = MEDIA_DIR / "botiran_news_default_thumbnail.png"
-        print(f"   ⚠️  Génération thumbnail échouée : {e.message} — utilisation du thumbnail par défaut.")
-        return default if default.exists() else None
-
-
-def _embed_thumbnail(video_path: Path, thumbnail_path: Path) -> Path:
-    """Insère le thumbnail comme première frame du MP4 (1 frame à 30fps ≈ 33ms)."""
-    tmp_path = video_path.with_suffix(".thumb.mp4")
-    one_frame = f"{1/30:.6f}"
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-loop", "1", "-framerate", "30", "-t", one_frame,
-        "-i", str(thumbnail_path),
-        "-f", "lavfi", "-t", one_frame,
-        "-i", "anullsrc=channel_layout=stereo:sample_rate=44100",
-        "-i", str(video_path),
-        "-filter_complex",
-        "[0:v][2:v]scale2ref[thumb][vid];"
-        "[thumb]setsar=1[thumb_s];"
-        "[thumb_s][1:a][vid][2:a]concat=n=2:v=1:a=1[v][a]",
-        "-map", "[v]", "-map", "[a]",
-        "-c:v", "libx264", "-c:a", "aac",
-        "-movflags", "+faststart",
-        str(tmp_path),
-    ], capture_output=True)
-    if proc.returncode != 0:
-        print(f"   ⚠️  Insertion première frame échouée : {proc.stderr.decode()[:200]}")
-        tmp_path.unlink(missing_ok=True)
-        return video_path
-    tmp_path.replace(video_path)
-    return video_path
-
-
-def concatenate_videos(
-    video_paths: list[Path],
-    output_path: Path,
-    metadata: dict[str, str] | None = None,
-    srt_path: Path | None = None,
-) -> Path:
-    """
-    Concatène les MP4 via le concat filter graph FFmpeg.
-    Chaque stream vidéo est normalisé à 30fps/SAR=1 et chaque stream audio à 44100Hz
-    avant d'être passé au filtre concat, ce qui garantit A/V sync parfaite à chaque
-    jonction quelle que soit la source (segments TTS ou interstitiels lavfi).
-    """
-    n = len(video_paths)
-    inputs = []
-    for p in video_paths:
-        inputs += ["-i", str(p)]
-
-    has_srt = srt_path is not None and srt_path.exists()
-    if has_srt:
-        inputs += ["-i", str(srt_path)]
-
-    # Normalise chaque clip indépendamment, puis les enchaîne
-    filter_parts = []
-    for i in range(n):
-        filter_parts.append(f"[{i}:v]fps=30,setsar=1[v{i}]")
-        filter_parts.append(f"[{i}:a]aresample=44100[a{i}]")
-
-    concat_inputs = "".join(f"[v{i}][a{i}]" for i in range(n))
-    filter_parts.append(f"{concat_inputs}concat=n={n}:v=1:a=1[vout][aout]")
-
-    filter_complex = ";".join(filter_parts)
-
-    meta_args = []
-    for k, v in (metadata or {}).items():
-        meta_args += ["-metadata", f"{k}={v}"]
-
-    map_args  = ["-map", "[vout]", "-map", "[aout]"]
-    sub_args  = []
-    if has_srt:
-        map_args += ["-map", f"{n}:s"]
-        sub_args  = ["-c:s", "mov_text", "-metadata:s:s:0", "language=fra"]
-
-    proc = subprocess.run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        *inputs,
-        "-filter_complex", filter_complex,
-        *map_args,
-        "-c:v", "libx264", "-preset", "medium", "-crf", "28",
-        "-c:a", "aac", "-b:a", "192k",
-        *sub_args,
-        *meta_args,
-        str(output_path),
-    ], capture_output=True)
-    if proc.returncode != 0:
-        raise RuntimeError(f"ffmpeg concat error: {proc.stderr.decode()}")
-    return output_path
-
-
-def _youtube_full_description(segments: list[str], date_str: str) -> str:
-    """Description YouTube pour la vidéo complète : chapitres + hashtags."""
-    lines = [f"Flash Info Guadeloupe — {date_str}\n"]
-    for i, seg in enumerate(segments):
-        if i == 0:
-            label = "Intro"
-        elif i == len(segments) - 1:
-            label = "Outro"
-        elif i == 1:
-            label = "Météo"
-        else:
-            label = f"Sujet {i - 1}"
-        first = seg.split(".")[0].strip()
-        if len(first) > 80:
-            first = first[:77] + "…"
-        lines.append(f"▸ {label} — {first}.")
-    lines.append(f"\n{_HASHTAGS_BASE} {_HASHTAGS_NEWS} {_HASHTAGS_METEO}")
-    return "\n".join(lines)
-
-
-def upload_youtube_video(video_path: Path, title: str, description: str) -> str:
-    """Upload une vidéo YouTube normale (pas un Short)."""
-    from googleapiclient.discovery import build
-    from googleapiclient.http import MediaFileUpload
-
-    print(f"   ▶️  Upload vidéo complète : {video_path.name}…")
-    creds = _youtube_credentials()
-    youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
-
-    body = {
-        "snippet": {
-            "title": title,
-            "description": description,
-            "tags": YOUTUBE_TAGS + ["flash info complet", "radio Guadeloupe"],
-            "categoryId": YOUTUBE_CATEGORY_ID,
-        },
-        "status": {
-            "privacyStatus": "public",
-            "selfDeclaredMadeForKids": False,
-        },
-    }
-    media = MediaFileUpload(str(video_path), mimetype="video/mp4", resumable=True)
-    request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
-
-    from googleapiclient.errors import ResumableUploadError
-    try:
-        response = None
-        while response is None:
-            _, response = request.next_chunk()
-    except ResumableUploadError as e:
-        if "uploadLimitExceeded" in str(e):
-            print(f"   ⚠️  Quota YouTube dépassé : limite journalière d'uploads atteinte — vidéo ignorée.")
-            return ""
-        raise
-
-    url = f"https://youtube.com/watch?v={response['id']}"
-    print(f"   ✅ {url}")
-    return url
-
-
-# ── Étape 8 : Publication LinkedIn ───────────────────────────────────────────
-
-_LINKEDIN_CHUNK = 4 * 1024 * 1024  # 4 Mo par chunk
-
-
-def _linkedin_save_tokens(access_token: str, refresh_token: str) -> None:
-    env_path = Path(__file__).parent / ".env"
-    lines = env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []
-    updates = {
-        "LINKEDIN_ACCESS_TOKEN":  access_token,
-        "LINKEDIN_REFRESH_TOKEN": refresh_token,
-    }
-    for key, val in updates.items():
-        for i, line in enumerate(lines):
-            if line.startswith(f"{key}="):
-                lines[i] = f"{key}={val}"
-                break
-        else:
-            lines.append(f"{key}={val}")
-    env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print("   Tokens LinkedIn sauvegardés dans .env")
-
-
-def _linkedin_ensure_token() -> str:
-    """Retourne un access token valide, en le rafraîchissant si possible."""
-    global LINKEDIN_ACCESS_TOKEN, LINKEDIN_REFRESH_TOKEN
-    if not (LINKEDIN_REFRESH_TOKEN and LINKEDIN_CLIENT_ID and LINKEDIN_CLIENT_SECRET):
-        return LINKEDIN_ACCESS_TOKEN
-    body = urllib.parse.urlencode({
-        "grant_type":    "refresh_token",
-        "refresh_token": LINKEDIN_REFRESH_TOKEN,
-        "client_id":     LINKEDIN_CLIENT_ID,
-        "client_secret": LINKEDIN_CLIENT_SECRET,
-    }).encode()
-    req = urllib.request.Request(
-        "https://www.linkedin.com/oauth/v2/accessToken",
-        data=body,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        data = json.loads(r.read())
-    LINKEDIN_ACCESS_TOKEN  = data["access_token"]
-    LINKEDIN_REFRESH_TOKEN = data.get("refresh_token", LINKEDIN_REFRESH_TOKEN)
-    _linkedin_save_tokens(LINKEDIN_ACCESS_TOKEN, LINKEDIN_REFRESH_TOKEN)
-    return LINKEDIN_ACCESS_TOKEN
-
-
-def upload_linkedin_video(video_path: Path, commentary: str) -> str:
-    """Publie une vidéo sur LinkedIn avec le texte fourni."""
-    token = _linkedin_ensure_token()
-    owner = f"urn:li:person:{LINKEDIN_PERSON_ID}"
-    file_size = video_path.stat().st_size
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "LinkedIn-Version": "202501",
-    }
-
-    # 1. Initialiser l'upload
-    print(f"   ▶️  Initialisation upload LinkedIn : {video_path.name}…")
-    init_body = json.dumps({
-        "initializeUploadRequest": {
-            "owner": owner,
-            "fileSizeBytes": file_size,
-            "uploadCaptions": False,
-            "uploadThumbnail": False,
-        }
-    }).encode()
-    req = urllib.request.Request(
-        "https://api.linkedin.com/v2/videos?action=initializeUpload",
-        data=init_body, headers=headers,
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        init_data = json.loads(r.read())
-
-    video_urn   = init_data["value"]["video"]
-    upload_token = init_data["value"]["uploadToken"]
-    instructions = init_data["value"]["uploadInstructions"]
-
-    # 2. Upload par chunks
-    video_bytes = video_path.read_bytes()
-    etags = []
-    for i, instruction in enumerate(instructions):
-        first, last = instruction["firstByteOffset"], instruction["lastByteOffset"]
-        chunk = video_bytes[first:last + 1]
-        print(f"   Chunk {i + 1}/{len(instructions)} ({len(chunk) // 1024} Ko)…")
-        put_req = urllib.request.Request(
-            instruction["uploadUrl"],
-            data=chunk, method="PUT",
-            headers={"Content-Type": "application/octet-stream"},
-        )
-        with urllib.request.urlopen(put_req, timeout=300) as r:
-            etags.append(r.headers.get("ETag", ""))
-
-    # 3. Finaliser l'upload
-    final_body = json.dumps({
-        "finalizeUploadRequest": {
-            "video": video_urn,
-            "token": upload_token,
-            "uploadedPartIds": etags,
-        }
-    }).encode()
-    req = urllib.request.Request(
-        "https://api.linkedin.com/v2/videos?action=finalizeUpload",
-        data=final_body, headers=headers,
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        r.read()
-
-    # 4. Créer le post
-    post_body = json.dumps({
-        "author": owner,
-        "commentary": commentary,
-        "visibility": "PUBLIC",
-        "distribution": {
-            "feedDistribution": "MAIN_FEED",
-            "targetEntities": [],
-            "thirdPartyDistributionChannels": [],
-        },
-        "content": {
-            "media": {"id": video_urn},
-        },
-        "lifecycleState": "PUBLISHED",
-        "isReshareDisabledByAuthor": False,
-    }).encode()
-    req = urllib.request.Request(
-        "https://api.linkedin.com/v2/posts",
-        data=post_body, headers=headers,
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        post_id = r.headers.get("x-restli-id", "")
-
-    url = f"https://www.linkedin.com/feed/update/{post_id}/" if post_id else "https://www.linkedin.com/feed/"
-    print(f"   ✅ {url}")
-    return url
-
-
-# ── Étape 9 : Publication Instagram ──────────────────────────────────────────
-
-_INSTAGRAM_API = "https://graph.facebook.com/v21.0"
-
-
-def _instagram_save_token(access_token: str) -> None:
-    env_path = Path(__file__).parent / ".env"
-    lines = env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []
-    for i, line in enumerate(lines):
-        if line.startswith("INSTAGRAM_ACCESS_TOKEN="):
-            lines[i] = f"INSTAGRAM_ACCESS_TOKEN={access_token}"
-            break
-    else:
-        lines.append(f"INSTAGRAM_ACCESS_TOKEN={access_token}")
-    env_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    print("   Token Instagram sauvegardé dans .env")
-
-
-def _instagram_refresh_token() -> str:
-    """Renouvelle le token Instagram long-lived (valide 60 jours)."""
-    global INSTAGRAM_ACCESS_TOKEN
-    if not INSTAGRAM_ACCESS_TOKEN:
-        return INSTAGRAM_ACCESS_TOKEN
-    qs = urllib.parse.urlencode({
-        "grant_type":   "ig_refresh_token",
-        "access_token": INSTAGRAM_ACCESS_TOKEN,
-    })
-    req = urllib.request.Request(
-        f"https://graph.instagram.com/refresh_access_token?{qs}"
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        data = json.loads(r.read())
-    INSTAGRAM_ACCESS_TOKEN = data["access_token"]
-    _instagram_save_token(INSTAGRAM_ACCESS_TOKEN)
-    return INSTAGRAM_ACCESS_TOKEN
-
-
-def upload_instagram_reel(video_path: Path, caption: str) -> str:
-    """Publie un Reel Instagram via upload direct (sans URL publique)."""
-    token = _instagram_refresh_token()
-    file_size = video_path.stat().st_size
-
-    # 1. Créer le container en mode upload resumable
-    print(f"   ▶️  Initialisation upload Instagram : {video_path.name}…")
-    qs = urllib.parse.urlencode({
-        "media_type":  "REELS",
-        "upload_type": "resumable",
-        "caption":     caption,
-        "access_token": token,
-    })
-    req = urllib.request.Request(
-        f"{_INSTAGRAM_API}/{INSTAGRAM_USER_ID}/media?{qs}",
-        data=b"", method="POST",
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        data = json.loads(r.read())
-    container_id = data["id"]
-    upload_uri   = data["uri"]
-
-    # 2. Upload la vidéo
-    print(f"   Upload vidéo ({file_size // 1024 // 1024} Mo)…")
-    video_bytes = video_path.read_bytes()
-    upload_req = urllib.request.Request(
-        upload_uri,
-        data=video_bytes, method="POST",
-        headers={
-            "Authorization": f"OAuth {token}",
-            "offset":        "0",
-            "file_size":     str(file_size),
-            "Content-Type":  "video/mp4",
-        },
-    )
-    with urllib.request.urlopen(upload_req, timeout=300) as r:
-        r.read()
-
-    # 3. Attendre que le container soit prêt (max 2 min 30)
-    print("   Traitement Instagram en cours…")
-    for attempt in range(30):
-        qs_status = urllib.parse.urlencode({
-            "fields": "status_code",
-            "access_token": token,
-        })
-        status_req = urllib.request.Request(
-            f"{_INSTAGRAM_API}/{container_id}?{qs_status}"
-        )
-        with urllib.request.urlopen(status_req, timeout=30) as r:
-            status = json.loads(r.read())
-        code = status.get("status_code", "")
-        if code == "FINISHED":
-            break
-        if code == "ERROR":
-            raise RuntimeError(f"Instagram container en erreur : {status}")
-        time.sleep(5)
-    else:
-        raise RuntimeError("Instagram : timeout en attente du container (150s)")
-
-    # 4. Publier
-    qs_pub = urllib.parse.urlencode({
-        "creation_id":  container_id,
-        "access_token": token,
-    })
-    pub_req = urllib.request.Request(
-        f"{_INSTAGRAM_API}/{INSTAGRAM_USER_ID}/media_publish?{qs_pub}",
-        data=b"", method="POST",
-    )
-    with urllib.request.urlopen(pub_req, timeout=30) as r:
-        pub_data = json.loads(r.read())
-
-    media_id = pub_data.get("id", "")
-    url = f"https://www.instagram.com/p/{media_id}/" if media_id else "https://www.instagram.com/"
-    print(f"   ✅ {url}")
     return url
 
 
@@ -2910,9 +1632,9 @@ def main():
         description=(
             "Flash info Guadeloupe — génère automatiquement un bulletin audio à partir\n"
             "des flux RSS locaux et de la météo Open-Meteo, rédigé par Maryse (Mistral)\n"
-            "et synthétisé en MP3 via Voxtral TTS, puis diffusé sur Telegram et Buzzsprout.\n\n"
+            "et synthétisé en MP3 via Voxtral TTS, puis diffusé sur Buzzsprout.\n\n"
             "Workflow : Collecte RSS → Météo → Rédaction Maryse → TTS par segment\n"
-            "           → Assemblage FFmpeg avec stinger → Telegram → Buzzsprout → X"
+            "           → Assemblage FFmpeg avec stinger → Buzzsprout"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -2945,15 +1667,15 @@ def main():
     parser.add_argument(
         "--dry-run", action="store_true",
         help=(
-            "Mode test : génère le script, l'audio et envoie sur Telegram,\n"
-            "mais n'envoie pas sur Buzzsprout ni X/Twitter."
+            "Mode test : génère le script et l'audio,\n"
+            "mais n'envoie pas sur Buzzsprout."
         ),
     )
     parser.add_argument(
         "--no-send", action="store_true",
         help=(
             "Génère le fichier audio MP3 complet mais ne l'envoie pas\n"
-            "(ni Telegram, ni Buzzsprout, ni X/Twitter).\n"
+            "(ni Buzzsprout).\n"
             "Utile pour écouter et valider avant diffusion."
         ),
     )
@@ -2962,49 +1684,6 @@ def main():
         help=(
             "Chemin complet du fichier MP3 de sortie.\n"
             "Défaut : /tmp/flash-YYYYMMDD-HHMM.mp3"
-        ),
-    )
-    parser.add_argument(
-        "--tiktok", action="store_true",
-        help=(
-            "Génère une vidéo MP4 TikTok (1080×1920) par segment audio.\n"
-            "Waveform colorée selon la tonalité + sous-titres karaoke mot à mot\n"
-            "via timestamps STT Voxtral. Vidéos dans /tmp/tiktok-YYYYMMDD-HHMM/.\n"
-            "Compatible avec --no-send."
-        ),
-    )
-    parser.add_argument(
-        "--youtube", action="store_true",
-        help=(
-            "Publie les vidéos MP4 sur YouTube Shorts via l'API YouTube Data v3.\n"
-            "Nécessite YOUTUBE_CLIENT_ID et YOUTUBE_CLIENT_SECRET dans .env.\n"
-            "Le refresh token est sauvegardé automatiquement après la première autorisation.\n"
-            "L'intro et l'outro sont exclus. Compatible avec --tiktok."
-        ),
-    )
-    parser.add_argument(
-        "--linkedin", action="store_true",
-        help=(
-            "Publie la vidéo complète sur LinkedIn avec l'intro et 5 hashtags aléatoires.\n"
-            "Nécessite LINKEDIN_ACCESS_TOKEN et LINKEDIN_PERSON_ID dans .env.\n"
-            "Compatible avec --tiktok et --youtube."
-        ),
-    )
-    parser.add_argument(
-        "--instagram", action="store_true",
-        help=(
-            "Publie la vidéo complète en Reel Instagram avec l'intro et 5 hashtags aléatoires.\n"
-            "Nécessite INSTAGRAM_ACCESS_TOKEN et INSTAGRAM_USER_ID dans .env.\n"
-            "Requiert un compte Instagram Business ou Créateur lié à une Page Facebook.\n"
-            "Compatible avec --tiktok, --youtube et --linkedin."
-        ),
-    )
-    parser.add_argument(
-        "--twitter", action="store_true",
-        help=(
-            "Publie la vidéo complète du flash info sur X/Twitter.\n"
-            "Nécessite X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET dans .env.\n"
-            "Compatible avec --tiktok."
         ),
     )
     parser.add_argument(
@@ -3029,21 +1708,6 @@ def main():
     parser.add_argument(
         "--check-feeds", action="store_true",
         help="Vérifie la disponibilité de chaque flux RSS et affiche un rapport. Arrêt sans générer d'audio.",
-    )
-    parser.add_argument(
-        "--test-interstitials", metavar="RÉPERTOIRE",
-        help=(
-            "Relit les seg_*.mp4 d'un répertoire généré précédemment, recrée les interstitiels,\n"
-            "concatène et envoie la vidéo complète sur Telegram. Ne refait pas la pipeline audio.\n"
-            "Exemple : --test-interstitials /tmp/tiktok-20260422-1100"
-        ),
-    )
-    parser.add_argument(
-        "--generate-thumbnail", action="store_true",
-        help=(
-            "Génère uniquement le thumbnail via OpenAI gpt-image-1.5 à partir d'un texte d'intro "
-            "par défaut, sans lancer la pipeline complète. Utile pour tester la génération d'image."
-        ),
     )
     parser.add_argument(
         "--horoscope-signs", type=int, default=3, metavar="N",
@@ -3084,13 +1748,8 @@ def main():
     parser.add_argument(
         "--thumbnail", type=Path, metavar="FICHIER",
         help=(
-            "Utilise l'image fournie comme thumbnail (PNG/JPG) au lieu de la générer via OpenAI. "
-            "L'image est embarquée dans le MP4 et envoyée sur Telegram avec la vidéo complète."
+            "Utilise l'image fournie comme thumbnail (PNG/JPG). "
         ),
-    )
-    parser.add_argument(
-        "--no-thumbnail", action="store_true",
-        help="Désactive la génération et l'embed du thumbnail (première frame et envoi Telegram).",
     )
     parser.add_argument(
         "--flush-used-articles", nargs="?", const="today", metavar="YYYY-MM-DD",
@@ -3105,7 +1764,7 @@ def main():
             "Sans argument : lance la pipeline complète en forçant l'inclusion de l'horoscope. "
             "Avec 'only' (--generate-horoscope only) : génère UNIQUEMENT le segment horoscope "
             "(rédaction Maryse + TTS, sans intro/météo/conclusion) et sauvegarde le MP3. "
-            "Combinable avec --horoscope-signs, --horoscope-include, --tiktok, --output."
+            "Combinable avec --horoscope-signs, --horoscope-include, --output."
         ),
     )
     args = parser.parse_args()
@@ -3199,26 +1858,6 @@ def main():
             print(segment)
             print("─────────────────────────────────────────────────────────")
 
-        # Génération vidéo TikTok/Shorts
-        if args.tiktok:
-            try:
-                video_dir = output_path.parent / f"horoscope-{_gen_date.strftime('%Y%m%d')}"
-                videos = generate_tiktok(
-                    seg_paths=[output_path],
-                    segments=[segment],
-                    tones=[tone],
-                    output_dir=video_dir,
-                    has_prenom=False,
-                    has_horoscope=True,
-                    has_meteo=False,
-                )
-                if videos:
-                    _, video_path = videos[0]
-                    print(f"🎬 Vidéo horoscope : {video_path}")
-                    send_telegram_video(video_path, f"🔮 Horoscope — {_date_fr(_gen_date)}")
-            except Exception as _e:
-                print(f"⚠️  TikTok/Telegram échoué (non bloquant) : {_e}")
-
         # Publication Buzzsprout
         if not args.dry_run and BUZZSPROUT_API_TOKEN and BUZZSPROUT_PODCAST_ID:
             _signs_label = ", ".join(signs_fr)
@@ -3286,62 +1925,6 @@ def main():
             print("  Aucun marronieur pour cette date.")
         print("─────────────────────────────────────────────────────────")
         return
-
-    if args.generate_thumbnail:
-        _DEFAULT_THUMBNAIL_INTRO = (
-            "Flash Info Guadeloupe — jeudi 23 avril 2026 "
-            "Bèl bonjou à toute la diaspora, nous sommes le jeudi vingt-trois avril deux mille vingt-six "
-            "et vous écoutez votre Flash Info avec les nouvelles de la Guadeloupe. "
-            "Au programme : Kalash en concert à Luxembourg, le tribunal mixte de commerce de Pointe-à-Pitre "
-            "qui doit trancher sur l'avenir d'Air Antilles et une joyeux anniversaire à Anne. C'est parti."
-        )
-        out = generate_thumbnail(
-            _DEFAULT_THUMBNAIL_INTRO,
-            Date.today(),
-            OUTPUT_DIR,
-            verbose=True,
-        )
-        if out:
-            print(f"✅ Thumbnail généré : {out}")
-            print("📤 Envoi thumbnail sur Telegram…")
-            send_telegram_photo(out, caption=f"🖼️ Thumbnail test — {Date.today()}")
-        return
-
-    if args.test_interstitials:
-        video_dir = Path(args.test_interstitials)
-        if not video_dir.is_dir():
-            print(f"❌ Répertoire introuvable : {video_dir}", file=sys.stderr)
-            sys.exit(1)
-        seg_files = sorted(video_dir.glob("seg_*.mp4"))
-        if not seg_files:
-            print(f"❌ Aucun fichier seg_*.mp4 dans {video_dir}", file=sys.stderr)
-            sys.exit(1)
-        items_json = video_dir / "items.json"
-        if items_json.exists():
-            saved_items = json.loads(items_json.read_text(encoding="utf-8"))
-            # Reconstruit le champ category si absent (items.json généré avant cette feature)
-            missing = sum(1 for it in saved_items if "category" not in it)
-            if missing:
-                print(f"   ⚠️  {missing} items sans category — reconstruction depuis le champ source")
-                for it in saved_items:
-                    if "category" not in it:
-                        it["category"] = _SOURCE_CATEGORY.get(it.get("source", ""), "general")
-        else:
-            print("   ⚠️  items.json absent — catégories indisponibles, tout sera 'general'")
-            saved_items = []
-        print(f"🎞️  {len(seg_files)} segments trouvés dans {video_dir}")
-        videos = [(int(p.stem.split("_")[1]), p) for p in seg_files]
-        print("🎞️  Génération des interstitiels…")
-        ordered = _interleave_interstitials(videos, saved_items, video_dir, resolve_stinger(args.stinger))
-        full_video_path = video_dir / f"flash-info-complet-{target_date}.mp4"
-        print("🎞️  Concaténation…")
-        concatenate_videos(ordered, full_video_path)
-        print(f"   Vidéo complète : {full_video_path} ({full_video_path.stat().st_size // 1024 // 1024} Mo)")
-        send_telegram_video(full_video_path, f"🎙️ Test interstitiels — {video_dir.name}")
-        print("✅ Envoyé sur Telegram.")
-        return
-
-    if args.check_feeds:
         if args.date:
             try:
                 check_date = Date.fromisoformat(args.date)
@@ -3492,8 +2075,7 @@ def main():
         print(f"  VERBOSE — {label}")
         print(f"══════════════════════════════════════════════════════════")
         for i, seg in enumerate(segs):
-            tag = _seg_label(i, len(segs), has_prenom=bool(prenoms_du_jour),
-                             has_horoscope=horoscope is not None, has_meteo=weather is not None)
+            tag = "INTRO" if i == 0 else "OUTRO" if i == len(segs) - 1 else f"SEGMENT {i}"
             print(f"\n  ── {tag} ──")
             print(f"  {seg.strip()}")
         print(f"\n  Texte brut (séparateurs inclus) :")
@@ -3526,16 +2108,12 @@ def main():
     segments = _ensure_sources_in_outro(segments, sources)
     segments = _enforce_prononciations(segments)
 
-    _seg_label_kwargs = dict(has_prenom=bool(prenoms_du_jour),
-                             has_horoscope=horoscope is not None,
-                             has_meteo=weather is not None)
-
     if args.verbose:
         _print_segments(segments, "SORTIE ANCRAGE LOCAL (final)")
     else:
         print("\n── Script final (après ancrage) ────────────────────────")
         for i, seg in enumerate(segments):
-            label = _seg_label(i, len(segments), **_seg_label_kwargs)
+            label = "INTRO" if i == 0 else "OUTRO" if i == len(segments) - 1 else f"SEGMENT {i}"
             print(f"\n{label}\n{seg}")
         print("\n────────────────────────────────────────────────────────\n")
 
@@ -3559,7 +2137,6 @@ def main():
     # Étape 2d — Classification tonale
     tones = classify_tones(segments)
     prenom_idx_0 = 1 if bool(prenoms_du_jour) else None
-    horoscope_idx_0 = _seg_label_kwargs  # reuse dict to compute idx
     # Force tonalités fixes pour prénoms et horoscope
     _k0 = 0
     if bool(prenoms_du_jour): _k0 += 1; _pi = _k0
@@ -3577,7 +2154,7 @@ def main():
         print("  VERBOSE — TONALITÉS PAR SEGMENT")
         print("══════════════════════════════════════════════════════════")
         for i, (tone, seg) in enumerate(zip(tones, segments)):
-            label = _seg_label(i, len(segments), **_seg_label_kwargs)
+            label = "INTRO" if i == 0 else "OUTRO" if i == len(segments) - 1 else f"SEG {i}"
             print(f"  {label:8s} → {tone:8s} ({TTS_VOICES.get(tone, TTS_VOICE_DEFAULT)})")
         print("══════════════════════════════════════════════════════════\n")
 
@@ -3594,7 +2171,7 @@ def main():
 
     output_path, seg_paths = generate_audio(
         segments, output_path, stinger, tones=tones,
-        keep_segments=args.tiktok or args.youtube or args.linkedin or args.instagram or args.twitter,
+        keep_segments=False,
     )
 
     # Sauvegarde anti-répétition
@@ -3620,155 +2197,10 @@ def main():
         identifier=ia_identifier,
         title=title,
         description=intro_text,
-        subject="guadeloupe;flash info;actualités;karukera;antilles;botiran",
     )
 
-    main_msg_id: int | None = None
-
-    if args.tiktok or args.youtube or args.linkedin or args.instagram or args.twitter:
-        video_dir = OUTPUT_DIR / f"tiktok-{edition}-{now.strftime('%Y%m%d-%H%M')}"
-        videos = generate_tiktok(seg_paths, segments, tones, video_dir,
-                                  has_prenom=bool(prenoms_du_jour), has_horoscope=horoscope is not None,
-                                  has_meteo=weather is not None)
-        print(f"\n🎬 {len(videos)} vidéos dans {video_dir}")
-        (video_dir / "items.json").write_text(
-            json.dumps(items, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-        for sp in seg_paths:
-            sp.unlink(missing_ok=True)
-
-        n_seg = len(segments)
-
-        # Segment videos stockés pour envoi en reply après la vidéo intégrale
-        _segment_videos = [(idx, vp) for idx, vp in videos if idx != 0 and idx != n_seg - 1]
-
-        if args.youtube:
-            print("▶️  Publication YouTube Shorts...")
-            for idx, video_path in videos:
-                if idx == 0 or idx == n_seg - 1:
-                    continue  # skip intro et outro
-                yt_label = "Météo" if idx == 1 else "Horoscope" if idx == 2 else f"Sujet {idx - 2}"
-                yt_title = f"Flash Info Guadeloupe — {date_str} — {yt_label}"
-                yt_desc = _youtube_description(segments[idx], idx, n_seg, date_str)
-                upload_youtube_short(video_path, yt_title, yt_desc)
-
-        # Vidéo complète : générée dès que --tiktok ou --youtube est actif
-        print("🎞️  Génération vidéo complète avec interstitiels…")
-        full_video_path = video_dir / f"flash-info-complet-{target_date}.mp4"
-        ordered = _interleave_interstitials(videos, items, video_dir, stinger,
-                                             has_prenom=bool(prenoms_du_jour),
-                                             has_horoscope=horoscope is not None,
-                                             has_meteo=weather is not None,
-                                             horoscope_signs=horoscope_signs,
-                                             prenoms_du_jour=prenoms_du_jour)
-        video_metadata = {
-            "title":       title,
-            "artist":      "Botiran",
-            "album":       "Flash Info Karukera",
-            "comment":     "Produit par Botiran Flash News",
-            "copyright":   f"© {date_str} Flash Info Karukera par Botiran",
-            "description": intro_text[:500],
-            "date":        date_str,
-            "genre":       "Flash Info / Actualités Guadeloupe",
-        }
-        # Sous-titres SRT embarqués (un chunk toutes les ~12 mots par segment)
-        path_to_text = {str(vp): segments[idx] for idx, vp in videos if idx < len(segments)}
-        srt_pairs = [(path_to_text.get(str(p)), _stinger_duration(p)) for p in ordered]
-        srt_path = video_dir / "subtitles.srt"
-        srt_path.write_text(_build_srt(srt_pairs), encoding="utf-8")
-        concatenate_videos(ordered, full_video_path, metadata=video_metadata, srt_path=srt_path)
-        print(f"   Vidéo complète : {full_video_path} ({full_video_path.stat().st_size // 1024 // 1024} Mo)")
-        b2_key_video = f"flash-info/{target_date.strftime('%Y/%m')}/{full_video_path.name}"
-        _upload_to_b2(full_video_path, b2_key_video)
-        _upload_to_archive_org(
-            full_video_path,
-            identifier=ia_identifier,
-            title=title,
-            description=intro_text,
-            subject="guadeloupe;flash info;vidéo;karukera;antilles;botiran",
-        )
-
-        # Hashtags agrégés (dédupliqués, ordre d'apparition)
-        seen, all_hashtags = set(), []
-        for it in items:
-            for h in it.get("hashtags", []):
-                if h not in seen:
-                    seen.add(h)
-                    all_hashtags.append(h)
-        hashtags_line = " ".join(all_hashtags)
-
-        # Thumbnail : fichier fourni par l'utilisateur ou génération OpenAI
-        thumbnail_path = None
-        if not args.no_thumbnail:
-            if args.thumbnail:
-                if not args.thumbnail.exists():
-                    print(f"   ⚠️  Thumbnail introuvable : {args.thumbnail} — ignoré.")
-                else:
-                    thumbnail_path = args.thumbnail
-                    print(f"   Thumbnail fourni : {thumbnail_path}")
-            else:
-                thumbnail_path = generate_thumbnail(
-                    intro_text, target_date, video_dir,
-                    hashtags=all_hashtags, verbose=args.verbose,
-                )
-        if thumbnail_path:
-            _embed_thumbnail(full_video_path, thumbnail_path)
-
-        headlines = "\n".join(f"• {it['title']}" for it in items if it.get("title"))
-        full_caption = f"🎙️ {title}\n\n{headlines}\n\n{hashtags_line}".strip()
-        if len(full_caption) > 1024:
-            full_caption = full_caption[:1021] + "…"
-
-        print("📤 Envoi vidéo complète sur Telegram (post principal)…")
-        main_msg_id = send_telegram_video(full_video_path, full_caption, timeout=300, thumbnail_path=thumbnail_path)
-
-        if args.tiktok and _segment_videos:
-            print("📤 Envoi des segments en reply…")
-            for idx, video_path in _segment_videos:
-                caption = _tiktok_caption(segments[idx], idx, n_seg, date_str)
-                send_telegram_video(video_path, caption, reply_to_message_id=main_msg_id)
-
-        if args.youtube:
-            print("▶️  Upload YouTube vidéo complète…")
-            yt_full_desc = _youtube_full_description(segments, date_str)
-            upload_youtube_video(full_video_path, title, yt_full_desc)
-
-        if args.linkedin:
-            print("▶️  Publication LinkedIn…")
-            li_hashtags = random.sample(all_hashtags, min(5, len(all_hashtags)))
-            li_commentary = f"{intro_text}\n\n{' '.join(li_hashtags)}".strip()
-            upload_linkedin_video(full_video_path, li_commentary)
-
-        if args.instagram:
-            print("▶️  Publication Instagram Reel…")
-            ig_hashtags = random.sample(all_hashtags, min(5, len(all_hashtags)))
-            ig_caption = f"{intro_text}\n\n{' '.join(ig_hashtags)}".strip()
-            upload_instagram_reel(full_video_path, ig_caption)
-
-        if args.twitter:
-            print("🐦 Publication X/Twitter…")
-            x_hashtags = random.sample(all_hashtags, min(4, len(all_hashtags)))
-            x_text = f"{title}\n\n{' '.join(x_hashtags)}"
-            post_x(x_text, video_path=full_video_path)
-
-    if args.transcript:
-        print("📝 Transcription de l'audio généré...")
-        transcript = transcribe_audio(output_path)
-        print("\n── Transcription ────────────────────────────────────────")
-        print(transcript)
-        print("────────────────────────────────────────────────────────\n")
-        transcript_path = output_path.with_suffix(".txt")
-        transcript_path.write_text(transcript, encoding="utf-8")
-        print(f"   Sauvegardé : {transcript_path}")
-
-    # Étape 4 — Telegram (dry-run inclus)
-    tg_audio_caption = f"🎙️ {title}\n\n{intro_text}".strip()
-    if len(tg_audio_caption) > 1024:
-        tg_audio_caption = tg_audio_caption[:1021] + "…"
-    send_telegram(output_path, tg_audio_caption, reply_to_message_id=main_msg_id)
-
     if args.dry_run:
-        print(f"--dry-run : audio généré et envoyé sur Telegram. Arrêt avant Buzzsprout/X.")
+        print(f"--dry-run : audio généré. Arrêt avant Buzzsprout.")
         return
 
     if args.no_send:
@@ -3798,7 +2230,7 @@ def main():
             episode_desc=intro_text,
             audio_url=podcast_audio_url,
             audio_size=output_path.stat().st_size,
-            duration_s=_stinger_duration(output_path),
+            duration_s=0,
             guid=output_path.stem,
             pub_date=datetime.utcnow(),
         )
