@@ -1,0 +1,73 @@
+name: Daily Flash Info Generation
+
+on:
+  schedule:
+    # Exécute tous les matins à 3h00 UTC (5h00 heure de Paris en été, 4h00 en hiver)
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # Permet de déclencher manuellement
+
+jobs:
+  generate-flash-info:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Nécessaire pour git history
+          
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Create audio directory
+        run: mkdir -p docs/audio
+          
+      - name: Generate Flash Info MP3
+        env:
+          # Configuration pour l'API Mistral
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          # Configuration pour Voxtral TTS
+          VOXTRALE_API_KEY: ${{ secrets.VOXTRALE_API_KEY }}
+          # Configuration optionnelle
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_TOKEN_SECRET: ${{ secrets.X_ACCESS_TOKEN_SECRET }}
+          ARCHIVE_ACCESS_KEY: ${{ secrets.ARCHIVE_ACCESS_KEY }}
+          ARCHIVE_SECRET_KEY: ${{ secrets.ARCHIVE_SECRET_KEY }}
+        run: |
+          # Générer le flash info pour l'édition du matin
+          python flash-info-astemo.py --edition matin --output docs/audio/flash-info-matin.mp3
+          
+          # Générer le flash info pour l'édition du midi
+          python flash-info-astemo.py --edition midi --output docs/audio/flash-info-midi.mp3
+          
+          # Générer le flash info pour l'édition du soir
+          python flash-info-astemo.py --edition soir --output docs/audio/flash-info-soir.mp3
+          
+      - name: Commit and push audio files
+        env:
+          PAT: ${{ secrets.PAT }}
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          
+          # Vérifier s'il y a des modifications
+          if [ -n "$(git status --porcelain docs/audio/)" ]; then
+            git add docs/audio/
+            git commit -m "🎙️ Daily Flash Info audio files - $(date +'%Y-%m-%d')"
+            # Utiliser le PAT pour pusher
+            git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
+            git push origin main
+          else
+            echo "No audio files generated or no changes to commit"
+          fi
