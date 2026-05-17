@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
-    <title>Freinage — Flash Info</title>
+    <title>L'actualité du Freinage</title>
     <link>https://famibelle.github.io/FlashInfoFreinage/</link>
-    <description>Flash info de Freinage — matin, midi et soir par Botiran</description>
+    <description>L'actualité du Freinage — matin, midi et soir par Botiran</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
     <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>
     <itunes:image href="https://famibelle.github.io/FlashInfoFreinage/artwork.jpg"/>
-    <image><url>https://famibelle.github.io/FlashInfoFreinage/artwork.jpg</url><title>Freinage — Flash Info</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>
+    <image><url>https://famibelle.github.io/FlashInfoFreinage/artwork.jpg</url><title>L'actualité du Freinage</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>
     <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
     <itunes:explicit>no</itunes:explicit>
     <itunes:type>episodic</itunes:type>

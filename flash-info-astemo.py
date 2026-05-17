@@ -531,7 +531,7 @@ def build_segments(
         n_segs = len(items) + base_segs
         news_block = f"Voici les {len(items)} actualités du jour :\n\n{articles}\n\n"
         outro_template = (
-            f"Voilà pour ce Flash Info Freinage du {date_str}. "
+            f"Voilà pour ce L'actualité du Freinage du {date_str}. "
             f"Sources : {sources_str}. "
             f"On se retrouve {rdv}. "
             f"{salut} à toutes et à tous."
@@ -634,7 +634,7 @@ def _ensure_sources_in_outro(segments: list[str], sources: list[str]) -> list[st
         import re
         sources_str = " et ".join(sources)
         outro = re.sub(
-            r"(Voilà pour ce Flash Info Freinage[^.]*\.)",
+            r"(Voilà pour ce L'actualité du Freinage[^.]*\.)",
             rf"\1 Sources : {sources_str}.",
             outro,
             count=1,
@@ -1556,7 +1556,7 @@ def main():
     if items:
         save_used_titles(target_date, [it["title"] for it in items])
 
-    title      = f"Flash Info Freinage — {date_str}, édition du {edition}"
+    title      = f"L'actualité du Freinage — {date_str}, édition du {edition}"
     intro_text = segments[0].strip() if segments else ""
 
     headlines = "\n".join(f"• {item['title']}" for item in items)
@@ -1572,7 +1572,7 @@ def main():
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
-            channel_title="Freinage — Flash Info",
+            channel_title="L'actualité du Freinage",
             channel_desc="Flash info de Freinage — matin, midi et soir par Botiran",
             episode_title=title,
             episode_desc=intro_text,
