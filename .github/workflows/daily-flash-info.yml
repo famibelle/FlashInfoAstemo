@@ -31,10 +31,9 @@ jobs:
           
       - name: Generate Flash Info MP3
         env:
-          # Configuration pour l'API Mistral
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
-          # Configuration pour Voxtral TTS
-          VOXTRALE_API_KEY: ${{ secrets.VOXTRALE_API_KEY }}
+          # Configuration API (Mistral API est utilisée pour Mistral et Voxtral)
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
+          VOXTRALE_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
           # Configuration optionnelle
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
