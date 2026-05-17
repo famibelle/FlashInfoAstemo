@@ -26,11 +26,10 @@ def parse_filename(filename: str) -> dict:
     """Parse le nom de fichier pour extraire date et édition.
     Format attendu : flash-info-astemo-YYYYMMDD-EDITION.mp3 ou .json
     """
-    # Exemple : flash-info-astemo-20260517-matin.mp3
     parts = filename.replace('.mp3', '').replace('.json', '').split('-')
     if len(parts) >= 4:
-        date_str = parts[-2]  # YYYYMMDD
-        edition = parts[-1]  # matin/midi/soir
+        date_str = parts[-2]
+        edition = parts[-1]
         try:
             date_obj = datetime.strptime(date_str, '%Y%m%d')
             return {
@@ -59,41 +58,53 @@ def generate_rss(episodes: list[dict]) -> str:
     for ep in episodes:
         mins, secs = divmod(int(ep['duration_s']), 60)
         duration_str = f"{mins:02d}:{secs:02d}"
-        
         pub_date = ep['pub_date'].strftime('%a, %d %b %Y %H:%M:%S +0000')
         
-        item = f"""    <item>
-      <title>{ep['titre']}</title>
-      <description><![CDATA[{ep['teaser']}]]></description>
-      <pubDate>{pub_date}</pubDate>
-      <enclosure url="{ep['audio_url']}" length="{ep['audio_size']}" type="audio/mpeg"/>
-      <guid isPermaLink="false">{ep['guid']}</guid>
-      <itunes:duration>{duration_str}</itunes:duration>
-    </item>"""
+        item = (
+            f"    <item>\n"
+            f"      <title>{ep['titre']}</title>\n"
+            f"      <description><![CDATA[{ep['teaser']}]]></description>\n"
+            f"      <pubDate>{pub_date}</pubDate>\n"
+            f"      <enclosure url=\"{ep['audio_url']}\" length=\"{ep['audio_size']}\" type=\"audio/mpeg\"/>\n"
+            f"      <guid isPermaLink=\"false\">{ep['guid']}</guid>\n"
+            f"      <itunes:duration>{duration_str}</itunes:duration>\n"
+            f"    </item>"
+        )
         items_xml.append(item)
     
     items_block = "\n\n".join(items_xml)
     
     artwork = "https://famibelle.github.io/FlashInfoAstemo/artwork.jpg"
-    return f'<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
-  <channel>
-    <title>L\'actualité du Freinage</title>
-    <link>https://famibelle.github.io/FlashInfoAstemo/</link>
-    <description>L\'actualité du Freinage — matin, midi et soir par MadelAIne</description>
-    <language>fr</language>
-    <copyright>© Botiran</copyright>
-    <itunes:author>Botiran</itunes:author>
-    <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>
-    <itunes:image href="{artwork}"/>
-    <image><url>{artwork}</url><title>L\'actualité du Freinage</title><link>https://famibelle.github.io/FlashInfoAstemo/</link></image>
-    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
-    <itunes:explicit>no</itunes:explicit>
-
-{items_block}
-
-  </channel>
-</rss>'
+    
+    rss = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">\n'
+        '  <channel>\n'
+        '    <title>L\'actualité du Freinage</title>\n'
+        '    <link>https://famibelle.github.io/FlashInfoAstemo/</link>\n'
+        '    <description>L\'actualité du Freinage — matin, midi et soir par MadelAIne</description>\n'
+        '    <language>fr</language>\n'
+        '    <copyright>© Botiran</copyright>\n'
+        '    <itunes:author>Botiran</itunes:author>\n'
+        '    <itunes:owner>\n'
+        '      <itunes:name>Botiran</itunes:name>\n'
+        '      <itunes:email>medhi.famibelle@outlook.fr</itunes:email>\n'
+        '    </itunes:owner>\n'
+        f'    <itunes:image href="{artwork}"/>\n'
+        '    <image>\n'
+        f'      <url>{artwork}</url>\n'
+        '      <title>L\'actualité du Freinage</title>\n'
+        '      <link>https://famibelle.github.io/FlashInfoAstemo/</link>\n'
+        '    </image>\n'
+        '    <itunes:category text="News">\n'
+        '      <itunes:category text="Daily News"/>\n'
+        '    </itunes:category>\n'
+        '    <itunes:explicit>no</itunes:explicit>\n\n'
+        f'{items_block}\n\n'
+        '  </channel>\n'
+        '</rss>'
+    )
+    return rss
 
 
 def main():

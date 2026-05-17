@@ -75,10 +75,11 @@ jobs:
           git config --global user.email "actions@github.com"
           
           # Synchroniser avant toute modification
-          git pull --rebase origin main || {
-            echo "⚠️  Pull échoué, tentative de reset..."
-            git fetch origin
-            git reset --hard origin/main
+          git fetch origin
+          git rebase origin/main || {
+            echo "⚠️  Rebase échoué - conflit à résoudre manuellement"
+            git rebase --abort
+            exit 1
           }
           
           if [ -n "$(git status --porcelain docs/audio/)" ]; then
