@@ -77,11 +77,6 @@ X_ACCESS_TOKEN_SECRET = os.environ.get("X_ACCESS_TOKEN_SECRET", "")
 
 OPENAI_API_KEY  = os.environ.get("OPENAI_API_KEY", "")
 
-B2_KEY_ID          = os.environ.get("B2_KEY_ID", "")
-B2_APPLICATION_KEY = os.environ.get("B2_APPLICATION_KEY", "")
-B2_BUCKET_NAME     = os.environ.get("B2_BUCKET_NAME", "")
-B2_ENDPOINT        = os.environ.get("B2_ENDPOINT", "")  # ex: https://s3.us-west-004.backblazeb2.com
-
 ARCHIVE_ACCESS_KEY = os.environ.get("ARCHIVE_ACCESS_KEY", "")
 ARCHIVE_SECRET_KEY = os.environ.get("ARCHIVE_SECRET_KEY", "")
 
@@ -1075,34 +1070,8 @@ def transcribe_with_words(audio_path: Path) -> list[dict]:
 
 
 
-# ── Backblaze B2 ──────────────────────────────────────────────────────────────
 
-def _upload_to_b2(local_path: Path, remote_key: str) -> str | None:
-    """Upload un fichier vers Backblaze B2 (S3-compatible). Non bloquant si non configuré."""
-    if not all([B2_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_NAME, B2_ENDPOINT]):
-        return None
-    try:
-        import boto3
-        from botocore.config import Config
-        client = boto3.client(
-            "s3",
-            endpoint_url=B2_ENDPOINT,
-            aws_access_key_id=B2_KEY_ID,
-            aws_secret_access_key=B2_APPLICATION_KEY,
-            config=Config(signature_version="s3v4"),
-        )
-        content_type = "audio/mpeg" if local_path.suffix == ".mp3" else "video/mp4"
-        client.upload_file(
-            str(local_path),
-            B2_BUCKET_NAME,
-            remote_key,
-            ExtraArgs={"ContentType": content_type},
-        )
-        print(f"   ☁️  B2 → {remote_key}")
-        return f"{B2_ENDPOINT}/{B2_BUCKET_NAME}/{remote_key}"
-    except Exception as e:
-        print(f"   ⚠️  B2 upload échoué (non bloquant) : {e}")
-        return None
+
 
 
 # ── GitHub Releases ───────────────────────────────────────────────────────────
@@ -1590,10 +1559,6 @@ def main():
     title      = f"Flash Info Drancy — {date_str}, édition du {edition}"
     intro_text = segments[0].strip() if segments else ""
 
-    # ── Backblaze B2 — audio ──────────────────────────────────────────────────
-    b2_key_audio = f"flash-info/{target_date.strftime('%Y/%m')}/{output_path.name}"
-    b2_audio_url = _upload_to_b2(output_path, b2_key_audio)
-
     # ── GitHub Releases — audio public ───────────────────────────────────────
     gh_tag = f"flash-info-{target_date.strftime('%Y-%m')}"
     gh_release_name = f"Flash Info Drancy — {target_date.strftime('%B %Y')}"
@@ -1614,7 +1579,7 @@ def main():
         f"Informations issues de : {sources_line}"
     )
     # ── Podcast RSS ───────────────────────────────────────────────────────────
-    podcast_audio_url = gh_audio_url or bz_audio_url or b2_audio_url
+    podcast_audio_url = gh_audio_url or None
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
