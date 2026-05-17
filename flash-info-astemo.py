@@ -1559,18 +1559,6 @@ def main():
     title      = f"Flash Info Freinage — {date_str}, édition du {edition}"
     intro_text = segments[0].strip() if segments else ""
 
-    # ── GitHub Releases — audio public ───────────────────────────────────────
-    gh_tag = f"flash-info-{target_date.strftime('%Y-%m')}"
-    gh_release_name = f"Flash Info Freinage — {target_date.strftime('%B %Y')}"
-
-    if args.dry_run:
-        print(f"--dry-run : audio généré. Arrêt avant Buzzsprout.")
-        return
-
-    if args.no_send:
-        print(f"--no-send : fichier disponible à {output_path}")
-        return
-
     headlines = "\n".join(f"• {item['title']}" for item in items)
     sources_line = " | ".join(sources) if sources else "médias locaux"
     description = (
@@ -1579,7 +1567,8 @@ def main():
         f"Informations issues de : {sources_line}"
     )
     # ── Podcast RSS ───────────────────────────────────────────────────────────
-    podcast_audio_url = gh_audio_url or None
+    # Utiliser l'URL GitHub Pages pour le fichier audio
+    podcast_audio_url = f"https://famibelle.github.io/FlashInfoAstemo/audio/{output_path.name}"
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
