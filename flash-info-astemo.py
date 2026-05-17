@@ -1227,6 +1227,37 @@ def _generate_catchy_title(items: list[dict], edition: str, date_str: str) -> st
         return f"L'actualité du Freinage — {date_str}, édition du {edition}"
 
 
+def _generate_teaser(items: list[dict], edition: str, date_str: str) -> str:
+    """Génère un teaser (accroche courte) via Mistral LLM à partir des actualités."""
+    if not items:
+        return f"L'actualité du freinage du {date_str} — édition du {edition}"
+    
+    articles_list = "\n".join(f"- {item['title']}" for item in items[:5])
+    
+    prompt = (
+        f"Tu es un rédacteur en chef spécialisé dans le freinage automobile.\n"
+        f"À partir des actualités suivantes, écris un TEASER accrocheur (une phrase courte et percutante)\n"
+        f"pour donner envie d'écouter le flash info du {edition}.\n"
+        f"Max 120 caractères. Style punchy et professionnel.\n\n"
+        f"Actualités :\n{articles_list}\n\n"
+        f"Réponds UNIQUEMENT avec le teaser, sans guillemets, sans retour à la ligne."
+    )
+    
+    try:
+        teaser = call_mistral(
+            system="Tu es un assistant strict qui répond uniquement avec le texte demandé.",
+            user=prompt,
+            temperature=0.9,
+            max_tokens=150,
+        )
+        # Nettoyer le résultat
+        teaser = teaser.strip().strip('"').strip("'").strip()
+        return teaser[:120] if teaser else f"Découvrez l'actualité du freinage du {date_str}"
+    except Exception as e:
+        print(f"   ⚠️  Génération teaser échouée : {e}")
+        return f"Découvrez l'actualité du freinage du {date_str}"
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=(
@@ -1483,8 +1514,13 @@ def main():
     catchy_title = _generate_catchy_title(items, edition, date_str) if items else f"L'actualité du Freinage — {date_str}, édition du {edition}"
     print(f"🎯 Titre accrocheur : {catchy_title}")
     
+    # Générer un teaser accrocheur via LLM
+    teaser = _generate_teaser(items, edition, date_str) if items else f"Découvrez l'actualité du freinage du {date_str}"
+    print(f"🎣 Teaser : {teaser}")
+    
     # Exporter pour utilisation par update_rss.py
     os.environ["CATCHY_TITLE"] = catchy_title
+    os.environ["TEASER"] = teaser
 
     segments_madelaine = build_segments(
         items, date_str, weather, sources,
