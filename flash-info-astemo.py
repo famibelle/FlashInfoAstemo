@@ -53,7 +53,7 @@ MAX_ITEMS      = 7     # 7 sujets → ~2m-2m30 audio
 DESC_MAX_CHARS = 400   # description tronquée pour donner assez de contexte
 HASHTAG_COUNT  = 5     # nombre de hashtags générés par article
 
-MISTRAL_API_KEY     = os.environ["MISTRAL_API_KEY"]
+MISTRAL_API_KEY     = os.environ["MISTRAL_API_KEY_ASTEMO"]
 TTS_MODEL           = "voxtral-mini-tts-2603"
 STT_MODEL           = "voxtral-mini-latest"
 TTS_VOICE_DEFAULT   = "fr_marie_neutral"
