@@ -192,7 +192,6 @@ _FR_DAYS = {
 }
 
 
-_LIEUX_GUADELOUPE_LOWER = {l.lower(): l for l in _LIEUX_GUADELOUPE}
 _LIEUX_MONDE_LOWER = {l.lower(): l for l in _LIEUX_MONDE}
 
 def _extract_lieu(title: str, desc: str) -> str:
@@ -210,7 +209,7 @@ def _extract_lieu(title: str, desc: str) -> str:
                 return lieu_orig
         return None
 
-    return _match(_LIEUX_GUADELOUPE_LOWER) or _match(_LIEUX_MONDE_LOWER) or "N/A"
+    return _match(_LIEUX_MONDE_LOWER) or "N/A"
 
 
 def _date_fr(d: Date) -> str:
