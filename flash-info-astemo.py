@@ -191,25 +191,6 @@ _FR_DAYS = {
     "Thursday": "jeudi", "Friday": "vendredi", "Saturday": "samedi", "Sunday": "dimanche",
 }
 
-def _source_name(url: str) -> str:
-    """Extrait un nom de média lisible depuis l'URL d'un flux RSS."""
-    from urllib.parse import urlparse
-    parsed = urlparse(url)
-    if parsed.scheme == "file":
-        return "Botiran News"
-    host = (parsed.hostname or "").removeprefix("www.")
-    for key, name in _SOURCE_NAMES.items():
-        if key in host:
-            return name
-    # fallback : premier segment du domaine, capitalisé
-    return host.split(".")[0].capitalize()
-
-
-# Fallback pour reconstruire category depuis le nom de source (items.json anciens)
-_SOURCE_CATEGORY: dict[str, str] = {
-    _source_name(s.url): s.category for s in RSS_SOURCES
-}
-
 
 _LIEUX_GUADELOUPE_LOWER = {l.lower(): l for l in _LIEUX_GUADELOUPE}
 _LIEUX_MONDE_LOWER = {l.lower(): l for l in _LIEUX_MONDE}
@@ -342,7 +323,7 @@ def fetch_news(feeds: list[str], max_items: int, target_date: Date, edition: str
     candidates = [
         {
             "title": t, "date": d, "desc": desc,
-            "source": _source_name(feed_url),
+            "source": next((s.name for s in RSS_SOURCES if s.url == feed_url), feed_url.split("/")[2].capitalize()),
             "lieu": _extract_lieu(t, desc),
             "category": _FEED_CATEGORY.get(feed_url, "general"),
         }
