@@ -2,43 +2,51 @@
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
     <title>L'actualité du Freinage</title>
-    <link>https://famibelle.github.io/FlashInfoFreinage/</link>
-    <description>L'actualité du Freinage - matin, midi et soir par MadelAIne</description>
+    <link>https://famibelle.github.io/FlashInfoAstemo/</link>
+    <description>L'actualité du Freinage — matin, midi et soir par MadelAIne</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
-    <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>
-    <itunes:image href="https://famibelle.github.io/FlashInfoFreinage/artwork.jpg"/>
-    <image><url>https://famibelle.github.io/FlashInfoFreinage/artwork.jpg</url><title>L'actualité du Freinage</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>
-    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
+    <itunes:owner>
+      <itunes:name>Botiran</itunes:name>
+      <itunes:email>medhi.famibelle@outlook.fr</itunes:email>
+    </itunes:owner>
+    <itunes:image href="https://famibelle.github.io/FlashInfoAstemo/artwork.jpg"/>
+    <image>
+      <url>https://famibelle.github.io/FlashInfoAstemo/artwork.jpg</url>
+      <title>L'actualité du Freinage</title>
+      <link>https://famibelle.github.io/FlashInfoAstemo/</link>
+    </image>
+    <itunes:category text="News">
+      <itunes:category text="Daily News"/>
+    </itunes:category>
     <itunes:explicit>no</itunes:explicit>
 
     <item>
-      <title>L actualite du Freinage - 2026-05-17, edition du matin</title>
-      <description><![CDATA[Découvrez l actualité du freinage du 2026-05-17]]></description>
-      <pubDate>Sun, 17 May 2026 20:28:04 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1495744" type="audio/mpeg"/>
+      <title>Freinage 2026 : Subaru innove, Nissens décolle</title>
+      <description><![CDATA[Freinage 2026 : Subaru innove, Nissens décolle – l’après-vente en ébullition ! 🚀🔥]]></description>
+      <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1510571" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
-      <itunes:duration>03:13</itunes:duration>
+      <itunes:duration>03:15</itunes:duration>
     </item>
 
-<item>
-      <title>L'actualité du Freinage - Sunday 17 May 2026, edition du matin</title>
-      <description><![CDATA[Flash info du 2026-05-17 - l essentiel de l actualite du freinage en moins de 2 minutes.]]></description>
-      <pubDate>Sun, 17 May 2026 19:42:50 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1770240" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
-      <itunes:duration>00:00</itunes:duration>
+    <item>
+      <title>Freinage 2026 : innovations et performances en ébullition</title>
+      <description><![CDATA[Freinage high-tech : Subaru, Ford Raptor et Ferrari Purosangue révolutionnent vos stops ! 🚗💨]]></description>
+      <pubDate>Sat, 16 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260516-matin.mp3" length="1694121" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260516-matin</guid>
+      <itunes:duration>03:36</itunes:duration>
     </item>
 
-<item>
-      <title>L'actualité du Freinage — dimanche 17 mai 2026, édition du matin</title>
-      <description><![CDATA[Bèl bonjou à toutes et à tous, nous sommes le dimanche 17 mai 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : les pièces frein du Subaru Uncharted 2026, une simulation de conduite plus accessible pour les équipes de compétition, et les dernières innovations en prototypes intelligents.
-C'est parti.]]></description>
-      <pubDate>Sun, 17 May 2026 19:42:48 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1770240" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
-      <itunes:duration>00:00</itunes:duration>
+    <item>
+      <title>Freinage 2026 : Subaru dévoile ses innovations choc</title>
+      <description><![CDATA[Freinage 2026 : Subaru innove, les plaquettes s’emballent ! 🚗💨]]></description>
+      <pubDate>Fri, 15 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260515-matin.mp3" length="1491397" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260515-matin</guid>
+      <itunes:duration>03:09</itunes:duration>
     </item>
 
   </channel>
