@@ -571,13 +571,6 @@ def call_mistral(
 
 
 MARYSE_SYSTEM        = _load_prompt("madelaine_ame.md") + "\n\n" + _load_prompt("madelaine.md")
-PRENOM_TEMPLATE      = _load_prompt("prenom.md")
-HOROSCOPE_TEMPLATE   = _load_prompt("horoscope.md")
-LIEUX_SPIRITUELS     = (
-    "\n\n" + _load_prompt("lieux_spirituels.md") +
-    "\n\n" + _load_prompt("flore_guadeloupe.md") +
-    "\n\n" + _load_prompt("faune_guadeloupe.md")
-)
 
 
 def _strip_markdown(text: str) -> str:
@@ -679,45 +672,6 @@ def build_segments(
         )
     else:
         n_segs = base_segs
-        news_block = ""
-        outro_template = (
-            f"Voilà pour ce Flash Info Guadeloupe du {date_str}. "
-            f"Sources : {sources_str}. "
-            f"On se retrouve {rdv}. "
-            f"{salut} à toutes et à tous."
-        )
-        news_instructions = (
-            f"- Segment {n_segs} : outro. Recopie ce modèle en remplaçant uniquement "
-            f"[prochain rendez-vous] :\n  \"{outro_template}\""
-        )
-
-    prenom_instruction = ""
-    if has_prenom:
-        prenoms_str = " et ".join(prenoms_du_jour)
-        is_demain = edition == "soir"
-        communes_mention = (
-            f" Mentionne aussi la fête patronale de {' et '.join(communes_du_jour)}."
-            if communes_du_jour else ""
-        )
-        prenom_instruction = PRENOM_TEMPLATE.format(
-            segment=prenom_seg,
-            prenoms=prenoms_str,
-            communes_mention=communes_mention,
-            demain_context=" de demain" if is_demain else "",
-        )
-
-    horoscope_block = ""
-    horoscope_instruction = ""
-    if has_horoscope:
-        n_signs = len(horoscope_signs) if horoscope_signs else 2
-        horoscope_block = f"HOROSCOPE DU JOUR ({n_signs} signe{'s' if n_signs > 1 else ''} tiré{'s' if n_signs > 1 else ''} au hasard) :\n{horoscope}\n\n"
-        horoscope_instruction = HOROSCOPE_TEMPLATE.format(
-            segment=horoscope_seg,
-            n_signs=n_signs,
-            s="s" if n_signs > 1 else "",
-            lieux_spirituels=LIEUX_SPIRITUELS,
-            contexte_local="",
-        )
 
     prenoms_block = ""
     if has_prenom:
@@ -759,9 +713,6 @@ def build_segments(
         f"{news_block}"
         f"Rédige exactement {n_segs} segments séparés par \"{SEG_SEPARATOR}\" :\n"
         f"- Segment 1 : intro (jour + date + accroche)\n"
-        f"{prenom_instruction}"
-        f"{meteo_instruction}"
-        f"{horoscope_instruction}"
         f"{news_instructions}"
     )
     if verbose:
@@ -793,48 +744,6 @@ def build_segments(
 
 
 # ── Étape 2b : Réviseur stylistique ──────────────────────────────────────────
-
-STYLIST_SYSTEM = _load_prompt("styliste.md")
-
-
-ANCHOR_SYSTEM = _load_prompt("ancrage.md")
-
-
-def anchor_local(segments: list[str], items: list[dict], verbose: bool = False) -> list[str]:
-    print("📍 Ancrage local (Mistral Large)...")
-    full_script = f"\n{SEG_SEPARATOR}\n".join(segments)
-    json_context = json.dumps(
-        [
-            {
-                "titre": it["title"],
-                "lieu": it.get("lieu", "N/A"),
-                "source": it["source"],
-                "description": it["desc"],
-            }
-            for it in items
-        ],
-        ensure_ascii=False, indent=2
-    )
-    user_prompt = (
-        f"SCRIPT_INITIAL :\n{full_script}\n\n"
-        f"JSON_EXTRACTION :\n{json_context}"
-    )
-    if verbose:
-        print("\n══════════════════════════════════════════════════════════")
-        print("  VERBOSE — PROMPT ANCRAGE LOCAL (system)")
-        print("══════════════════════════════════════════════════════════")
-        print(ANCHOR_SYSTEM)
-        print("\n  ── user_prompt ──")
-        print(user_prompt)
-        print("══════════════════════════════════════════════════════════\n")
-    raw = call_mistral(ANCHOR_SYSTEM, user_prompt)
-    # Supprime tout préambule que le LLM ajoute avant le script (ex. "SCRIPT_ENRICHI :", "Voici le script...")
-    raw = re.sub(r'(?im)^(?:script_\w+\s*:|voici\s+le\s+script\b)[^\n]*\n', '', raw.lstrip())
-    anchored = [_strip_markdown(s) for s in raw.split(SEG_SEPARATOR) if s.strip()]
-
-    if len(anchored) != len(segments):
-        print(f"   ⚠️  Ancrage retourné {len(anchored)} segments au lieu de {len(segments)} — fallback sur l'original")
-        return segments
 
     print(f"   Ancrage appliqué ({len(anchored)} segments)")
     return anchored
@@ -874,25 +783,6 @@ def _ensure_sources_in_outro(segments: list[str], sources: list[str]) -> list[st
         segments = segments[:-1] + [outro]
     return segments
 
-
-def revise_style(segments: list[str], verbose: bool = False) -> list[str]:
-    print("✏️  Révision stylistique (Mistral Large)...")
-    full_script = f"\n{SEG_SEPARATOR}\n".join(segments)
-    if verbose:
-        print("\n══════════════════════════════════════════════════════════")
-        print("  VERBOSE — PROMPT RÉVISEUR STYLISTIQUE (system)")
-        print("══════════════════════════════════════════════════════════")
-        print(STYLIST_SYSTEM)
-        print("\n  ── user_prompt (script) ──")
-        print(full_script)
-        print("══════════════════════════════════════════════════════════\n")
-    raw = call_mistral(STYLIST_SYSTEM, full_script)
-    raw = re.sub(r'(?im)^(?:script_\w+\s*:|voici\s+le\s+script\b)[^\n]*\n', '', raw.lstrip())
-    revised = [_strip_markdown(s) for s in raw.split(SEG_SEPARATOR) if s.strip()]
-
-    if len(revised) != len(segments):
-        print(f"   ⚠️  Réviseur a retourné {len(revised)} segments au lieu de {len(segments)} — fallback sur l'original")
-        return segments
 
     print(f"   Révision appliquée ({len(revised)} segments)")
     return revised
@@ -1725,16 +1615,6 @@ def main():
             "une phrase de bénédiction ou de congé, puis une formule de rendez-vous du type "
             "'À demain pour un nouvel horoscope' ou une variante naturelle, jamais la même tournure."
         )
-        horoscope_instruction = HOROSCOPE_TEMPLATE.format(
-            segment=1, n_signs=n_signs, s="s" if n_signs > 1 else "",
-            lieux_spirituels=LIEUX_SPIRITUELS,
-            contexte_local=_contexte_local,
-        )
-        horoscope_block = (
-            f"HOROSCOPE DU JOUR ({n_signs} signe{'s' if n_signs > 1 else ''} "
-            f"tiré{'s' if n_signs > 1 else ''} au hasard) :\n{horoscope_text}\n\n"
-        )
-        user_prompt = f"{horoscope_block}INSTRUCTIONS :\n{horoscope_instruction}"
         print("✍️  Rédaction horoscope par Maryse (Mistral Large)...")
         segment = _strip_markdown(call_mistral(_horoscope_only_system, user_prompt, temperature=0.75, max_tokens=250 * n_signs + 300))
 
@@ -1980,7 +1860,6 @@ def main():
         _print_segments(segments_maryse, "SORTIE MARYSE (brut)")
 
     # Étape 2b — Révision stylistique
-    segments = revise_style(segments_maryse, verbose=args.verbose)
     segments = _ensure_sources_in_outro(segments, sources)
     segments = _enforce_prononciations(segments)
 
