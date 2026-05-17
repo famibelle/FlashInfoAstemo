@@ -570,7 +570,7 @@ def call_mistral(
                 raise
 
 
-MARYSE_SYSTEM        = _load_prompt("maryse_ame.md") + "\n\n" + _load_prompt("maryse.md")
+MARYSE_SYSTEM        = _load_prompt("madelaine_ame.md") + "\n\n" + _load_prompt("madelaine.md")
 PRENOM_TEMPLATE      = _load_prompt("prenom.md")
 HOROSCOPE_TEMPLATE   = _load_prompt("horoscope.md")
 LIEUX_SPIRITUELS     = (
@@ -1716,7 +1716,7 @@ def main():
         # Prompt ciblé : âme de Maryse + instruction horoscope seule, sans structure de flash
         _date_label = _date_fr(_gen_date)
         _horoscope_only_system = (
-            _load_prompt("maryse_ame.md") + "\n\n"
+            _load_prompt("madelaine_ame.md") + "\n\n"
             "Tu rédiges UNIQUEMENT le segment horoscope — pas de météo, pas d'actualités. "
             "Juste la lecture de l'horoscope dans ta voix.\n"
             f"Commence OBLIGATOIREMENT par : 'Nous sommes le {_date_label} et ' "
