@@ -5,6 +5,11 @@ on:
     # Exécute tous les matins à 3h00 UTC (5h00 heure de Paris en été, 4h00 en hiver)
     - cron: '0 3 * * *'
   workflow_dispatch:  # Permet de déclencher manuellement
+    inputs:
+      date:
+        description: 'Date pour les infos (format YYYY-MM-DD). La date du jour si omis.'
+        required: false
+        default: ''
 
 jobs:
   generate-flash-info:
@@ -33,9 +38,17 @@ jobs:
         env:
           MISTRAL_API_KEY_ASTEMO: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
         run: |
-          DATE=$(date +'%Y%m%d')
+          # Utiliser la date fournie ou la date du jour
+          INPUT_DATE="${{ github.event.inputs.date }}"
+          if [ -n "$INPUT_DATE" ]; then
+            DATE=$(date -d "$INPUT_DATE" +'%Y%m%d')
+            DATE_ARG="--date $INPUT_DATE"
+          else
+            DATE=$(date +'%Y%m%d')
+            DATE_ARG=""
+          fi
           OUTPUT_FILE="docs/audio/flash-info-astemo-${DATE}-matin.mp3"
-          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE" --verbose
+          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE" --verbose $DATE_ARG
           echo "DATE=${DATE}" >> $GITHUB_ENV
            
       - name: Update podcast RSS and push
