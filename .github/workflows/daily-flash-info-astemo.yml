@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    timeout-minutes: 30
     
     steps:
       - name: Checkout repository
@@ -39,6 +40,18 @@ jobs:
       - name: Create audio directory
         run: mkdir -p docs/audio
            
+      - name: Cleanup temp files
+        run: |
+          rm -f /tmp/flash_info_output/_seg_*.mp3 /tmp/flash_info_output/_seg_*_p.mp3 2>/dev/null || true
+
+      - name: Verify environment
+        run: |
+          echo "✅ Vérification de l'environnement..."
+          [ -n "${{ secrets.MISTRAL_API_KEY_ASTEMO }}" ] || { echo "❌ MISTRAL_API_KEY_ASTEMO manquant"; exit 1; }
+          command -v ffmpeg >/dev/null 2>&1 || { echo "❌ ffmpeg non installé"; exit 1; }
+          command -v ffprobe >/dev/null 2>&1 || { echo "❌ ffprobe non installé"; exit 1; }
+          echo "✅ Environnement valide"
+          
       - name: Generate Flash Info MP3
         env:
           MISTRAL_API_KEY_ASTEMO: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
@@ -61,10 +74,16 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
+          # Synchroniser avant toute modification
+          git pull --rebase origin main || {
+            echo "⚠️  Pull échoué, tentative de reset..."
+            git fetch origin
+            git reset --hard origin/main
+          }
+          
           if [ -n "$(git status --porcelain docs/audio/)" ]; then
             git add docs/audio/
             git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
-            git pull --rebase origin main
             git push origin main
             
             # Mettre à jour le RSS pour Apple Podcasts
@@ -72,7 +91,6 @@ jobs:
             
             git add docs/podcast.xml
             git commit -m "📻 RSS : nouvel épisode ${DATE}"
-            git pull --rebase origin main
             git push origin main
           else
             echo "No audio files generated"
