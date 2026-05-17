@@ -55,8 +55,6 @@ jobs:
           echo "DATE=${DATE}" >> $GITHUB_ENV
            
       - name: Update podcast RSS and push
-        env:
-          PAT: ${{ secrets.PAT }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
@@ -64,7 +62,6 @@ jobs:
           if [ -n "$(git status --porcelain docs/audio/)" ]; then
             git add docs/audio/
             git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
-            git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
             git push origin main
             
             # Mettre à jour le RSS pour Apple Podcasts
