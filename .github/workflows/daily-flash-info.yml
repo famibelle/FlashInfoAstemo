@@ -38,7 +38,7 @@ jobs:
         run: |
           # Générer le flash info pour l'édition du matin uniquement
           OUTPUT_FILE="docs/audio/flash-info-astemo-$(date +'%Y%m%d')-matin.mp3"
-          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE"
+          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE" --verbose
           
       - name: Commit and push audio files
         env:
