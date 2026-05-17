@@ -53,7 +53,9 @@ MAX_ITEMS      = 7     # 7 sujets → ~2m-2m30 audio
 DESC_MAX_CHARS = 400   # description tronquée pour donner assez de contexte
 HASHTAG_COUNT  = 5     # nombre de hashtags générés par article
 
-MISTRAL_API_KEY_ASTEMO     = os.environ["MISTRAL_API_KEY_ASTEMO"]
+MISTRAL_API_KEY_ASTEMO = os.environ.get("MISTRAL_API_KEY_ASTEMO")
+if not MISTRAL_API_KEY_ASTEMO:
+    raise RuntimeError("❌ La variable MISTRAL_API_KEY_ASTEMO est manquante dans les secrets GitHub")
 TTS_MODEL           = "voxtral-mini-tts-2603"
 STT_MODEL           = "voxtral-mini-latest"
 TTS_VOICE_DEFAULT   = "fr_marie_neutral"
