@@ -1215,38 +1215,45 @@ def _update_podcast_rss(
 def _generate_catchy_title(items: list[dict], edition: str, date_str: str) -> str:
     """Génère un titre accrocheur via Mistral LLM à partir des actualités."""
     if not items:
-        return f"L'actualité du Freinage — {date_str}, édition du {edition}"
+        return f"Flash Info {edition.capitalize()} — {date_str}"
     
-    articles_list = "\n".join(f"- {item['title']}" for item in items[:5])  # Top 5 articles
+    articles_list = "\n".join(f"- {item['title']}" for item in items[:5])
     
     prompt = (
-        f"Tu es un rédacteur en chef spécialisé dans le freinage automobile et la mobilité.\n"
-        f"À partir des actualités suivantes, invente un titre ACCROCHEUR, PERCUTANT et PROFESSIONNEL\n"
-        f"(max 60 caractères) pour un flash info du {edition}.\n\n"
+        f"Tu es un rédacteur en chef spécialisé dans le freinage automobile.\n"
+        f"À partir des actualités suivantes, invente un titre ACCROCHEUR et PERCUTANT\n"
+        f"(max 60 caractères) pour un flash info du {edition}.\n"
+        f"\n"
+        f"⚠️  INTERDIT : ne pas utiliser 'Freinage 2026', 'L'actualité du Freinage', ou des termes redondants.\n"
+        f"Sois original et direct.\n\n"
         f"Actualités :\n{articles_list}\n\n"
         f"Réponds UNIQUEMENT avec le titre, sans guillemets, sans points, sans retour à la ligne."
     )
     
     try:
         title = call_mistral(
-            system="Tu es un assistant strict qui répond uniquement avec le texte demandé, sans ajout.",
+            system="Tu es un assistant strict. Réponds UNIQUEMENT avec le texte demandé, sans ajout ni explication.",
             user=prompt,
             temperature=0.8,
             max_tokens=100,
         )
         # Nettoyer le résultat
         title = title.strip().strip('"').strip("'").strip()
+        # Retirer les termes redondants
+        title = title.replace("Freinage 2026", "").strip()
+        title = title.replace("L'actualité du Freinage", "").strip()
+        title = title.replace("Flash Info", "").strip()
         # Limiter à 60 caractères
-        return title[:60] if title else f"L'actualité du Freinage — {date_str}"
+        return title[:60] if title else f"Flash Info {edition.capitalize()} — {date_str}"
     except Exception as e:
         print(f"   ⚠️  Génération titre accrocheur échouée : {e}")
-        return f"L'actualité du Freinage — {date_str}, édition du {edition}"
+        return f"Flash Info {edition.capitalize()} — {date_str}"
 
 
 def _generate_teaser(items: list[dict], edition: str, date_str: str) -> str:
     """Génère un teaser (accroche courte) via Mistral LLM à partir des actualités."""
     if not items:
-        return f"L'actualité du freinage du {date_str} — édition du {edition}"
+        return f"Découvrez le flash info du {date_str} — {edition}"
     
     articles_list = "\n".join(f"- {item['title']}" for item in items[:5])
     
@@ -1254,24 +1261,30 @@ def _generate_teaser(items: list[dict], edition: str, date_str: str) -> str:
         f"Tu es un rédacteur en chef spécialisé dans le freinage automobile.\n"
         f"À partir des actualités suivantes, écris un TEASER accrocheur (une phrase courte et percutante)\n"
         f"pour donner envie d'écouter le flash info du {edition}.\n"
-        f"Max 120 caractères. Style punchy et professionnel.\n\n"
+        f"Max 120 caractères. Style punchy et professionnel.\n"
+        f"\n"
+        f"⚠️  INTERDIT : ne pas utiliser 'Freinage 2026', 'L'actualité du Freinage', ou 'Flash Info'.\n"
+        f"Sois original et engageant.\n\n"
         f"Actualités :\n{articles_list}\n\n"
         f"Réponds UNIQUEMENT avec le teaser, sans guillemets, sans retour à la ligne."
     )
     
     try:
         teaser = call_mistral(
-            system="Tu es un assistant strict qui répond uniquement avec le texte demandé.",
+            system="Tu es un assistant strict. Réponds UNIQUEMENT avec le texte demandé.",
             user=prompt,
             temperature=0.9,
             max_tokens=150,
         )
         # Nettoyer le résultat
         teaser = teaser.strip().strip('"').strip("'").strip()
-        return teaser[:120] if teaser else f"Découvrez l'actualité du freinage du {date_str}"
+        # Retirer les termes redondants
+        for term in ["Freinage 2026", "L'actualité du Freinage", "Flash Info"]:
+            teaser = teaser.replace(term, "").strip()
+        return teaser[:120] if teaser else f"Découvrez le flash info du {date_str} — {edition}"
     except Exception as e:
         print(f"   ⚠️  Génération teaser échouée : {e}")
-        return f"Découvrez l'actualité du freinage du {date_str}"
+        return f"Découvrez le flash info du {date_str} — {edition}"
 
 
 def main():
