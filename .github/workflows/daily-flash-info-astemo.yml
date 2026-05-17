@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Nécessaire pour git history
+          fetch-depth: 0
           
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,32 +28,36 @@ jobs:
           
       - name: Create audio directory
         run: mkdir -p docs/audio
-          
+           
       - name: Generate Flash Info MP3
         env:
-          # Configuration API (Mistral API est utilisée pour Mistral et Voxtral)
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
           VOXTRALE_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Générer le flash info pour l'édition du matin uniquement
-          OUTPUT_FILE="docs/audio/flash-info-astemo-$(date +'%Y%m%d')-matin.mp3"
+          DATE=$(date +'%Y%m%d')
+          OUTPUT_FILE="docs/audio/flash-info-astemo-${DATE}-matin.mp3"
           python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE" --verbose
-          
-      - name: Commit and push audio files
+          echo "DATE=${DATE}" >> $GITHUB_ENV
+           
+      - name: Update podcast RSS and push
         env:
           PAT: ${{ secrets.PAT }}
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           
-          # Vérifier s'il y a des modifications
           if [ -n "$(git status --porcelain docs/audio/)" ]; then
             git add docs/audio/
-            git commit -m "🎙️ Daily Flash Info audio files - $(date +'%Y-%m-%d')"
-            # Utiliser le PAT pour pusher
+            git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
             git remote set-url origin https://x-access-token:${PAT}@github.com/${{ github.repository }}
             git push origin main
+            
+            # Mettre à jour le RSS pour Apple Podcasts
+            python scripts/update_rss.py
+            
+            git add docs/podcast.xml
+            git commit -m "📻 RSS : nouvel épisode ${DATE}"
+            git push origin main
           else
-            echo "No audio files generated or no changes to commit"
+            echo "No audio files generated"
           fi
