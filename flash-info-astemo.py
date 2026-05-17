@@ -1537,6 +1537,20 @@ def main():
     # Exporter pour utilisation par update_rss.py
     os.environ["CATCHY_TITLE"] = catchy_title
     os.environ["TEASER"] = teaser
+    
+    # Sauvegarder les métadonnées dans un JSON (texte, titre, teaser)
+    if items and args.output:
+        json_output_path = args.output.with_suffix('.json')
+        metadata = {
+            "titre": catchy_title,
+            "teaser": teaser,
+            "texte": "\n\n---\n\n".join(segments) if segments else ""
+        }
+        json_output_path.write_text(
+            json.dumps(metadata, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+        print(f"💾 Métadonnées sauvegardées → {json_output_path}")
 
     segments_madelaine = build_segments(
         items, date_str, weather, sources,
