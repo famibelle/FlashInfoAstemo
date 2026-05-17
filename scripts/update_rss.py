@@ -11,6 +11,9 @@ from datetime import datetime
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
+# Définir la variable d'environnement requise (même vide) pour éviter l'erreur
+os.environ.setdefault("MISTRAL_API_KEY_ASTEMO", "")
+
 # Charger le module principal (nom avec tiret) via runpy
 flash_info_astemo = runpy.run_path(str(project_root / "flash-info-astemo.py"))
 _update_podcast_rss = flash_info_astemo['_update_podcast_rss']
