@@ -11,7 +11,6 @@ Tu reçois un tableau JSON de segments. Pour chaque segment, renvoie UN tag parm
 Règles :
 - Segment 1 (intro) → "happy" par défaut, sauf si le sommaire est dominé par des drames.
 - Segment 2 (météo) → "neutral" sauf alerte cyclonique → "sad".
-- Segment 3 (horoscope, s'il est présent) → toujours "curious".
 - Dernier segment (outro) → "happy".
 - En cas d'ambiguïté → "neutral".
 

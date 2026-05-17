@@ -428,89 +428,10 @@ def fetch_weather(target_date: Date) -> str:
     print(f"   {summary}")
     return summary
 
-
-# ── Horoscope ────────────────────────────────────────────────────────────────
-
-HOROSCOPE_API = "https://freehoroscopeapi.com/api/v1/get-horoscope/daily"
-
-_SIGNS = [
-    "aries", "taurus", "gemini", "cancer", "leo", "virgo",
-    "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces",
-]
-_SIGN_FR = {
-    "aries": "Bélier", "taurus": "Taureau", "gemini": "Gémeaux",
-    "cancer": "Cancer", "leo": "Lion", "virgo": "Vierge",
-    "libra": "Balance", "scorpio": "Scorpion", "sagittarius": "Sagittaire",
-    "capricorn": "Capricorne", "aquarius": "Verseau", "pisces": "Poissons",
-}
-# Lookup inverse : nom français (minuscules) → clé anglaise
-_SIGN_FR_TO_EN = {v.lower(): k for k, v in _SIGN_FR.items()}
-
-
-def _resolve_sign(name: str) -> str | None:
-    """Convertit un nom de signe (fr ou en, casse libre) en clé anglaise, ou None si inconnu."""
-    key = name.strip().lower()
-    if key in _SIGNS:
-        return key
-    return _SIGN_FR_TO_EN.get(key)
-
-
-def _sign_for_date(d: Date) -> str:
-    """Retourne la clé anglaise du signe zodiacal correspondant à la date."""
-    m, day = d.month, d.day
-    if (m == 3 and day >= 21) or (m == 4 and day <= 19): return "aries"
-    if (m == 4 and day >= 20) or (m == 5 and day <= 20): return "taurus"
-    if (m == 5 and day >= 21) or (m == 6 and day <= 20): return "gemini"
-    if (m == 6 and day >= 21) or (m == 7 and day <= 22): return "cancer"
-    if (m == 7 and day >= 23) or (m == 8 and day <= 22): return "leo"
-    if (m == 8 and day >= 23) or (m == 9 and day <= 22): return "virgo"
-    if (m == 9 and day >= 23) or (m == 10 and day <= 22): return "libra"
-    if (m == 10 and day >= 23) or (m == 11 and day <= 21): return "scorpio"
-    if (m == 11 and day >= 22) or (m == 12 and day <= 21): return "sagittarius"
-    if (m == 12 and day >= 22) or (m == 1 and day <= 19): return "capricorn"
-    if (m == 1 and day >= 20) or (m == 2 and day <= 18): return "aquarius"
-    return "pisces"
-
-
-def fetch_horoscope(n_signs: int = 2, include_signs: "list[str] | None" = None) -> "tuple[str, list[str]] | None":
-    """Retourne (texte, signes_fr) pour n_signs signes aléatoires, ou None si l'API est indisponible.
-
-    include_signs : liste de clés anglaises à inclure de force ; les slots restants sont tirés au hasard.
-    """
-    forced = list(dict.fromkeys(include_signs or []))  # dédoublonnage, ordre conservé
-    pool = [s for s in _SIGNS if s not in forced]
-    n_random = max(0, n_signs - len(forced))
-    signs = forced + random.sample(pool, min(n_random, len(pool)))
-    print(f"🔮  Collecte horoscope ({len(signs)} signe{'s' if len(signs) > 1 else ''}" +
-          (f", dont {', '.join(_SIGN_FR[s] for s in forced)} imposé{'s' if len(forced) > 1 else ''}" if forced else "") + ")...")
-    entries, signs_fr = [], []
-    for sign in signs:
-        try:
-            qs = urllib.parse.urlencode({"sign": sign})
-            req = urllib.request.Request(
-                f"{HOROSCOPE_API}?{qs}",
-                headers={"User-Agent": "Mozilla/5.0 (compatible; FlashInfoKarukera/1.0)"},
-            )
-            with urllib.request.urlopen(req, timeout=15) as r:
-                data = json.loads(r.read())
-            text = (
-                data.get("horoscope")
-                or data.get("data", {}).get("horoscope", "")
-                or data.get("description", "")
-            )
-            if text:
-                entries.append(f"{_SIGN_FR[sign]} ({sign.capitalize()}) : {text}")
-                signs_fr.append(_SIGN_FR[sign])
-                print(f"   {_SIGN_FR[sign]} ✅")
-        except Exception as e:
-            print(f"   ⚠️  Horoscope {sign} : {e}")
-    if not entries:
-        print("   ⚠️  Horoscope indisponible — rubrique omise.")
-        return None
     return "\n".join(entries), signs_fr
 
 
-# ── Étape 2 : Segments rédigés par Maryse via Mistral ────────────────────────
+# ── Étape 2 : Segments rédigés par Madelaine via Mistral ─────────────────────
 
 MISTRAL_CHAT_MODEL = "mistral-large-latest"
 MISTRAL_CHAT_URL   = "https://api.mistral.ai/v1/chat/completions"
@@ -570,7 +491,8 @@ def call_mistral(
                 raise
 
 
-MARYSE_SYSTEM        = _load_prompt("madelaine_ame.md") + "\n\n" + _load_prompt("madelaine.md")
+MADELAINE_SYSTEM = _load_prompt("madelaine_ame.md") + "\n\n" + _load_prompt("madelaine.md") + "\n\n" + _load_prompt("instructions.md")
+MARYSE_SYSTEM = MADELAINE_SYSTEM  # alias pour compatibilité
 
 
 def _strip_markdown(text: str) -> str:
@@ -582,45 +504,11 @@ def _strip_markdown(text: str) -> str:
     return text.strip()
 
 
-# ── Prénom du jour ────────────────────────────────────────────────────────────
 
-NOMINIS_API = "https://nominis.cef.fr/json/nominis.php"
-
-
-
-def fetch_prenom_du_jour(target_date: "datetime.date") -> "list[str] | None":
-    """Retourne la liste des prénoms fêtés à la date donnée, ou None si l'API est indisponible."""
-    date_label = _date_fr(target_date)
-    print(f"🎂  Collecte prénoms du {date_label} (nominis.cef.fr)...")
-    try:
-        qs = urllib.parse.urlencode({
-            "jour":   target_date.day,
-            "mois":   target_date.month,
-            "année":  target_date.year,
-        })
-        req = urllib.request.Request(
-            f"{NOMINIS_API}?{qs}",
-            headers={"User-Agent": "Mozilla/5.0 (compatible; FlashInfoKarukera/1.0)"},
-        )
-        with urllib.request.urlopen(req, timeout=10) as r:
-            data = json.loads(r.read().decode())
-        prenoms = list(data.get("response", {}).get("prenoms", {}).get("majeurs", {}).keys())
-        if prenoms:
-            print(f"   Prénoms du {date_label} : {', '.join(prenoms)}")
-            return prenoms
-        print(f"   ⚠️  Aucun prénom trouvé pour le {date_label}")
-        return None
-    except Exception as exc:
-        print(f"   ⚠️  Impossible de récupérer les prénoms du {date_label} : {exc}")
-        return None
 
 
 def build_segments(
     items: list[dict], date_str: str, weather: "str | None", sources: list[str],
-    horoscope: str | None = None,
-    horoscope_signs: "list[str] | None" = None,
-    prenoms_du_jour: "list[str] | None" = None,
-    communes_du_jour: "list[str] | None" = None,
     marroniers_du_jour: "list | None" = None,
     edition: str = "matin",
     weather_label: str = "MÉTÉO DU JOUR",
@@ -628,27 +516,21 @@ def build_segments(
     heure_paris: "str | None" = None,
     verbose: bool = False,
 ) -> list[str]:
-    print(f"✍️  Rédaction des segments par Maryse — édition {edition.upper()} (Mistral Large)...")
+    print(f"✍️  Rédaction des segments par Madelaine — édition {edition.upper()} (Mistral Large)...")
     articles = "\n\n".join(
         f"[{i+1}] {item['title']}\n{item['desc']}" for i, item in enumerate(items)
     )
-    has_meteo     = weather is not None
-    has_horoscope = horoscope is not None
-    has_prenom    = bool(prenoms_du_jour)
+    has_meteo = bool(weather)
 
     # Calcul dynamique des indices (1-based dans le prompt LLM)
     _idx = 1  # INTRO = segment 1
-    prenom_seg = horoscope_seg = meteo_seg = None
-    if has_prenom:
-        _idx += 1; prenom_seg = _idx
+    meteo_seg = None
     if has_meteo:
         _idx += 1; meteo_seg = _idx
-    if has_horoscope:
-        _idx += 1; horoscope_seg = _idx
     news_offset = _idx + 1  # premier segment d'actu (1-based)
 
     sources_str = " et ".join(sources) if sources else "les médias locaux"
-    base_segs = 2 + (1 if has_prenom else 0) + (1 if has_meteo else 0) + (1 if has_horoscope else 0)
+    base_segs = 2 + (1 if has_meteo else 0)
 
     salut, rdv = _EDITION_OUTRO[edition]
     if items:
@@ -668,12 +550,6 @@ def build_segments(
         )
     else:
         n_segs = base_segs
-
-    prenoms_block = ""
-    if has_prenom:
-        label_prenom = "PRÉNOM DE DEMAIN" if edition == "soir" else "PRÉNOM DU JOUR"
-        prenoms_block = f"{label_prenom} : {' et '.join(prenoms_du_jour)}\n\n"
-
 
     marroniers_block = ""
     if marroniers_du_jour:
@@ -700,7 +576,6 @@ def build_segments(
         f"Flash info Guadeloupe du {date_str}{heure_ctx} — {edition_instruction}\n\n"
         f"{meteo_block}"
         f"{marroniers_block}"
-        f"{horoscope_block}"
         f"{news_block}"
         f"Rédige exactement {n_segs} segments séparés par \"{SEG_SEPARATOR}\" :\n"
         f"- Segment 1 : intro (jour + date + accroche)\n"
@@ -708,15 +583,14 @@ def build_segments(
     )
     if verbose:
         print("\n══════════════════════════════════════════════════════════")
-        print("  VERBOSE — PROMPT MARYSE (system)")
+        print("  VERBOSE — PROMPT MADELAINE (system)")
         print("══════════════════════════════════════════════════════════")
         print(MARYSE_SYSTEM)
         print("\n  ── user_prompt ──")
         print(user_prompt)
         print("══════════════════════════════════════════════════════════\n")
-    _horoscope_tokens = 150 * (len(horoscope_signs) if horoscope_signs else 2) if has_horoscope else 0
-    _base_tokens = 1400 if (has_prenom or has_meteo) else 1200
-    raw = call_mistral(MARYSE_SYSTEM, user_prompt, temperature=0.75, max_tokens=_base_tokens + _horoscope_tokens)
+    _base_tokens = 1400 if has_meteo else 1200
+    raw = call_mistral(MARYSE_SYSTEM, user_prompt, temperature=0.75, max_tokens=_base_tokens)
 
     import re as _re
     segments = [_strip_markdown(s) for s in raw.split(SEG_SEPARATOR) if s.strip()]
@@ -1406,9 +1280,9 @@ def main():
     parser = argparse.ArgumentParser(
         description=(
             "Flash info Guadeloupe — génère automatiquement un bulletin audio à partir\n"
-            "des flux RSS locaux et de la météo Open-Meteo, rédigé par Maryse (Mistral)\n"
+            "des flux RSS locaux et de la météo Open-Meteo, rédigé par Madelaine (Mistral)\n"
             "et synthétisé en MP3 via Voxtral TTS, puis diffusé sur Buzzsprout.\n\n"
-            "Workflow : Collecte RSS → Météo → Rédaction Maryse → TTS par segment\n"
+            "Workflow : Collecte RSS → Météo → Rédaction Madelaine → TTS par segment\n"
             "           → Assemblage FFmpeg avec stinger → Buzzsprout"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -1424,8 +1298,8 @@ def main():
     parser.add_argument(
         "--edition", choices=["matin", "midi", "soir"], default=None,
         help=(
-            "Édition à diffuser : matin (météo+prénoms+horoscope+infos), "
-            "midi (infos uniquement), soir (météo demain+prénoms demain+infos). "
+            "Édition à diffuser : matin (météo+infos), "
+            "midi (infos uniquement), soir (météo demain+infos). "
             "Auto-détection par heure de Paris si omis."
         ),
     )
@@ -1484,35 +1358,8 @@ def main():
         "--check-feeds", action="store_true",
         help="Vérifie la disponibilité de chaque flux RSS et affiche un rapport. Arrêt sans générer d'audio.",
     )
-    parser.add_argument(
-        "--horoscope-signs", type=int, default=3, metavar="N",
-        help="Nombre de signes astrologiques à inclure dans la rubrique horoscope (défaut : 2).",
-    )
-    parser.add_argument(
-        "--horoscope-include", nargs="+", action="append", default=[], metavar="SIGNE",
-        help=(
-            "Inclure un ou plusieurs signes de force dans l'horoscope (français ou anglais). "
-            "Exemple : --horoscope-include gemini capricorn taurus. Répétable. "
-            "Signes disponibles : "
-            + ", ".join(f"{fr} ({en})" for en, fr in _SIGN_FR.items())
-            + "."
-        ),
-    )
-    parser.add_argument(
-        "--test-horoscope", action="store_true",
-        help=(
-            "Récupère l'horoscope du jour pour N signes aléatoires (voir --horoscope-signs) "
-            "et affiche le résultat brut de l'API, sans lancer la pipeline complète."
-        ),
-    )
-    parser.add_argument(
-        "--test-prenom", nargs="?", const="today", metavar="YYYY-MM-DD",
-        help=(
-            "Récupère les prénoms depuis nominis.cef.fr sans lancer la pipeline. "
-            "Sans date : utilise aujourd'hui (ou --date si fourni). "
-            "Exemple : --test-prenom 2026-04-26"
-        ),
-    )
+
+
     parser.add_argument(
         "--test-marroniers", action="store_true",
         help=(
@@ -1533,131 +1380,14 @@ def main():
             "Exemple : --flush-used-articles 2026-04-25"
         ),
     )
-    parser.add_argument(
-        "--generate-horoscope", nargs="?", const="only", metavar="only",
-        help=(
-            "Sans argument : lance la pipeline complète en forçant l'inclusion de l'horoscope. "
-            "Avec 'only' (--generate-horoscope only) : génère UNIQUEMENT le segment horoscope "
-            "(rédaction Maryse + TTS, sans intro/météo/conclusion) et sauvegarde le MP3. "
-            "Combinable avec --horoscope-signs, --horoscope-include, --output."
-        ),
-    )
+
     args = parser.parse_args()
 
-    if args.test_horoscope:
-        _inc = [s for name in (n for group in args.horoscope_include for n in group) if (s := _resolve_sign(name))]
-        result = fetch_horoscope(n_signs=args.horoscope_signs, include_signs=_inc or None)
-        if result:
-            text, signs_fr = result
-            print("\n── Horoscope brut ───────────────────────────────────────")
-            print(text)
-            print(f"\nSignes retenus : {', '.join(signs_fr)}")
-            print("─────────────────────────────────────────────────────────")
-        return
 
-    if args.generate_horoscope == "only":
-        _inc = [s for name in (n for group in args.horoscope_include for n in group) if (s := _resolve_sign(name))]
-        _gen_date = Date.fromisoformat(args.date) if args.date else Date.today()
-        _date_sign = _sign_for_date(_gen_date)
-        if _date_sign not in _inc:
-            _inc = [_date_sign] + _inc
-            print(f"📅 Signe déduit de la date ({_gen_date}) : {_SIGN_FR[_date_sign]}")
-        result = fetch_horoscope(n_signs=args.horoscope_signs, include_signs=_inc or None)
-        if not result:
-            print("❌ Impossible de récupérer l'horoscope.", file=sys.stderr)
-            sys.exit(1)
-        horoscope_text, signs_fr = result
-        n_signs = len(signs_fr)
-        print(f"🔮 Signes retenus : {', '.join(signs_fr)}")
-        if args.verbose:
-            print("\n══════════════════════════════════════════════════════════")
-            print("  VERBOSE — HOROSCOPE BRUT (fetch_horoscope)")
-            print("══════════════════════════════════════════════════════════")
-            print(horoscope_text)
-            print("══════════════════════════════════════════════════════════\n")
 
-        # Collecte du contexte local pour ancrage
-        _weather_summary = None
-        try:
-            _weather_summary = fetch_weather(_gen_date)
-        except Exception:
-            pass
-        _marroniers = _get_marroniers_du_jour(_gen_date)
-        _contexte_lines = []
-        if _weather_summary:
-            _contexte_lines.append(f"Météo du jour à Pointe-à-Pitre : {_weather_summary}")
-        if _marroniers:
-            _contexte_lines.append("Événements du jour en Guadeloupe : " +
-                " ; ".join(f"{m.evenement} ({m.lieu})" for m in _marroniers))
-        _contexte_local = (
-            "\n\nCONTEXTE LOCAL DU JOUR :\n" + "\n".join(_contexte_lines)
-            if _contexte_lines else ""
-        )
 
-        # Prompt ciblé : âme de Maryse + instruction horoscope seule, sans structure de flash
-        _date_label = _date_fr(_gen_date)
-        _horoscope_only_system = (
-            _load_prompt("madelaine_ame.md") + "\n\n"
-            "Tu rédiges UNIQUEMENT le segment horoscope — pas de météo, pas d'actualités. "
-            "Juste la lecture de l'horoscope dans ta voix.\n"
-            f"Commence OBLIGATOIREMENT par : 'Nous sommes le {_date_label} et ' "
-            "puis enchaîne directement avec ta formule ancestrale d'introduction des signes.\n"
-            "Termine OBLIGATOIREMENT par une courte formule de clôture dans ta voix — "
-            "une phrase de bénédiction ou de congé, puis une formule de rendez-vous du type "
-            "'À demain pour un nouvel horoscope' ou une variante naturelle, jamais la même tournure."
-        )
-        print("✍️  Rédaction horoscope par Maryse (Mistral Large)...")
-        segment = _strip_markdown(call_mistral(_horoscope_only_system, user_prompt, temperature=0.75, max_tokens=250 * n_signs + 300))
 
-        # TTS
-        output_path = Path(args.output) if args.output else Path("horoscope.mp3")
-        tmp = output_path.with_suffix(".tmp.mp3")
-        print(f"🔊 Synthèse vocale → {output_path}")
-        tone = classify_tones([segment])[0]
-        print(f"   Tonalité : {tone}")
-        _tts_call(_normalize_for_tts(segment), tmp, TTS_VOICES.get(tone, TTS_VOICE_DEFAULT))
-        tmp.rename(output_path)
-        print(f"✅ Segment horoscope sauvegardé : {output_path}")
-        if args.verbose:
-            print("\n── Texte rédigé ─────────────────────────────────────────")
-            print(segment)
-            print("─────────────────────────────────────────────────────────")
 
-        # Publication Buzzsprout
-        if not args.dry_run and BUZZSPROUT_API_TOKEN and BUZZSPROUT_PODCAST_ID:
-            _signs_label = ", ".join(signs_fr)
-            _bz_title = f"Horoscope du {_date_fr(_gen_date)} — {_signs_label}"
-            _bz_description = (
-                f"Horoscope du {_date_fr(_gen_date)} par Maryse.\n"
-                f"Signes du jour : {_signs_label}.\n\n"
-                "Flash Info Karukera — actualités et horoscope de la Guadeloupe."
-            )
-            publish_buzzsprout(output_path, _bz_title, _bz_description, BUZZSPROUT_TAGS)  # retourne (episode_url, audio_url) mais non utilisé ici
-        elif args.dry_run:
-            print("--dry-run : pas de publication Buzzsprout.")
-        else:
-            print("⚠️  BUZZSPROUT_API_TOKEN / BUZZSPROUT_PODCAST_ID manquants — publication ignorée.")
-
-        return
-
-    if args.test_prenom is not None:
-        if args.test_prenom not in (None, "today"):
-            try:
-                target_date = Date.fromisoformat(args.test_prenom)
-            except ValueError:
-                print(f"❌ Date invalide : '{args.test_prenom}'. Attendu : YYYY-MM-DD", file=sys.stderr)
-                sys.exit(1)
-        elif args.date:
-            target_date = Date.fromisoformat(args.date)
-        else:
-            target_date = Date.today()
-        prenoms = fetch_prenom_du_jour(target_date)
-        if prenoms:
-            print("\n── Prénoms ──────────────────────────────────────────────")
-            print(f"Date    : {_date_fr(target_date)}")
-            print(f"Prénoms : {', '.join(prenoms)}")
-            print("─────────────────────────────────────────────────────────")
-        return
 
     if args.flush_used_articles is not None:
         if args.flush_used_articles not in (None, "today"):
@@ -1782,26 +1512,7 @@ def main():
     else:
         weather = weather_label = tomorrow_str = None
 
-    if edition == "matin":
-        include_signs = []
-        for name in (n for group in args.horoscope_include for n in group):
-            resolved = _resolve_sign(name)
-            if resolved:
-                include_signs.append(resolved)
-            else:
-                print(f"⚠️  Signe inconnu ignoré : '{name}' (valeurs valides : {', '.join(_SIGNS)})")
-        horoscope_result = fetch_horoscope(n_signs=args.horoscope_signs, include_signs=include_signs or None)
-        horoscope, horoscope_signs = horoscope_result if horoscope_result else (None, [])
-    else:
-        horoscope = None
-        horoscope_signs = []
 
-    prenoms_date = tomorrow if edition == "soir" else target_date
-    if edition == "soir":
-        print(f"📅  Édition soir : prénoms et communes pour demain ({_date_fr(tomorrow)})")
-    if edition != "midi":
-        prenoms_du_jour  = fetch_prenom_du_jour(prenoms_date)
-        prenoms_du_jour = None
 
     marroniers_du_jour = _get_marroniers_du_jour(target_date) or None
     if marroniers_du_jour:
@@ -1817,11 +1528,8 @@ def main():
         print(f"  {weather}")
         print("══════════════════════════════════════════════════════════\n")
 
-    segments_maryse = build_segments(
+    segments_madelaine = build_segments(
         items, date_str, weather, sources,
-        horoscope=horoscope,
-        horoscope_signs=horoscope_signs,
-        prenoms_du_jour=prenoms_du_jour,
         marroniers_du_jour=marroniers_du_jour,
         edition=edition,
         weather_label=weather_label or "MÉTÉO DU JOUR",
@@ -1843,9 +1551,10 @@ def main():
         print("══════════════════════════════════════════════════════════\n")
 
     if args.verbose:
-        _print_segments(segments_maryse, "SORTIE MARYSE (brut)")
+        _print_segments(segments_madelaine, "SORTIE MADELAINE (brut)")
 
     # Étape 2b — Révision stylistique
+    segments = segments_madelaine
     segments = _ensure_sources_in_outro(segments, sources)
     segments = _enforce_prononciations(segments)
 
@@ -1895,18 +1604,8 @@ def main():
 
     # Étape 2d — Classification tonale
     tones = classify_tones(segments)
-    prenom_idx_0 = 1 if bool(prenoms_du_jour) else None
-    # Force tonalités fixes pour prénoms et horoscope
     _k0 = 0
-    if bool(prenoms_du_jour): _k0 += 1; _pi = _k0
-    else: _pi = None
     if weather is not None: _k0 += 1
-    if horoscope is not None: _k0 += 1; _hi = _k0
-    else: _hi = None
-    if _pi is not None and len(tones) > _pi:
-        tones[_pi] = "happy"
-    if _hi is not None and len(tones) > _hi:
-        tones[_hi] = "curious"
 
     if args.verbose:
         print("\n══════════════════════════════════════════════════════════")
@@ -1973,8 +1672,8 @@ def main():
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
-            channel_title="Karukera — Flash Info & Horoscope",
-            channel_desc="Flash info et horoscope de la Guadeloupe — matin, midi et soir par Botiran",
+            channel_title="Karukera — Flash Info",
+            channel_desc="Flash info de la Guadeloupe — matin, midi et soir par Botiran",
             episode_title=title,
             episode_desc=intro_text,
             audio_url=podcast_audio_url,
