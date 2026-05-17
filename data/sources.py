@@ -1,4 +1,4 @@
-"""Flux RSS suivis pour le Flash Info Karukera."""
+"""Flux RSS suivis pour le Flash Info Astemo."""
 
 from dataclasses import dataclass
 from pathlib import Path
