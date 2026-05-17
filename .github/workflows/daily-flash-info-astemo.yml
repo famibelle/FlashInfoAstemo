@@ -35,7 +35,25 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
+
+      - name: Verify Git state
+        run: |
+          # Vérifier qu'il n'y a pas de conflits ou modifications non commitées
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ ERREUR: Répertoire Git non propre (fichiers non commités)"
+            echo "   Fichiers modifiés :"
+            git status --porcelain
+            exit 1
+          fi
+          # Vérifier que la branche est synchronisée avec origin
+          git fetch origin >/dev/null 2>&1
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
+            echo "❌ ERREUR: Branche locale non synchronisée avec origin/main"
+            echo "   → Exécutez: git pull --rebase origin main"
+            exit 1
+          fi
+          echo "✅ État Git valide"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
