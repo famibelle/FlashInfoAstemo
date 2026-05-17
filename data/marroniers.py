@@ -1,4 +1,4 @@
-"""Marroniers annuels de Guadeloupe — événements récurrents à date fixe ou variable.
+"""Marroniers annuels de Drancy — événements récurrents à date fixe ou variable.
 
 Ne contient PAS les fêtes communales/patronales (gérées dans fetes_patronales.py).
 Les dates variables (carnaval, Pâques) sont calculées dynamiquement pour chaque année.
@@ -153,7 +153,7 @@ MARRONIERS: list[Marronieur] = [
 
     # ── Août ──────────────────────────────────────────────────────────────────
     Marronieur(
-        evenement="Tour cycliste de Guadeloupe",
+        evenement="Tour cycliste de Drancy",
         lieu="Toute l'île",
         categorie="Sport",
         date_debut="08-06",

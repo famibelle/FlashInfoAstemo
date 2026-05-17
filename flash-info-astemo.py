@@ -1,7 +1,7 @@
 #!/home/medhi/SourceCode/KreyolKeyb/.venv/bin/python3
 """
-Flash info Guadeloupe — workflow complet
-Collecte RSS → Script → Audio TTS (Voxtral) → Publication Buzzsprout
+Flash Info — workflow complet
+Collecte RSS → Script → Audio TTS (Voxtral)
 """
 
 import os
@@ -68,8 +68,7 @@ TTS_VOICES = {
     "curious":  "fr_marie_curious",
 }
 
-BUZZSPROUT_API_TOKEN  = os.environ.get("BUZZSPROUT_API_TOKEN", "")
-BUZZSPROUT_PODCAST_ID = os.environ.get("BUZZSPROUT_PODCAST_ID", "")
+
 
 X_API_KEY            = os.environ.get("X_API_KEY", "")
 X_API_SECRET         = os.environ.get("X_API_SECRET", "")
@@ -87,7 +86,7 @@ ARCHIVE_ACCESS_KEY = os.environ.get("ARCHIVE_ACCESS_KEY", "")
 ARCHIVE_SECRET_KEY = os.environ.get("ARCHIVE_SECRET_KEY", "")
 
 GITHUB_TOKEN     = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO      = "famibelle/FlashInfoKarukera"
+GITHUB_REPO      = "famibelle/FlashInfoDrancy"
 
 OUTPUT_DIR      = Path(tempfile.gettempdir()) / "flash_info_output"
 STINGERS_DIR    = Path(__file__).parent / "Stingers"
@@ -98,7 +97,7 @@ ARCHIVES_DIR    = Path(__file__).parent / "archives" / "flash-info"
 DOCS_DIR        = Path(__file__).parent / "docs"
 PODCAST_RSS_PATH = DOCS_DIR / "podcast.xml"
 BOTIRAN_PROFILE = MEDIA_DIR / "botiran_profile.jpg"
-GUADELOUPE_TZ   = ZoneInfo("America/Guadeloupe")
+DRANCY_TZ      = ZoneInfo("Europe/Paris")
 
 # ── Éditions ──────────────────────────────────────────────────────────────────
 
@@ -163,8 +162,8 @@ def save_used_titles(target_date: Date, new_titles: list[str]) -> None:
     p.write_text(json.dumps({"titles": all_titles}, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"💾  Anti-répétition : {len(all_titles)} titres enregistrés ({p.name})")
 
-WEATHER_LAT  = 16.17    # centre Guadeloupe (entre Basse-Terre et Grande-Terre)
-WEATHER_LON  = -61.58
+WEATHER_LAT  = 48.9086   # Drancy (Seine-Saint-Denis)
+WEATHER_LON  = 2.4431
 WEATHER_API         = "https://api.open-meteo.com/v1/forecast"
 WEATHER_API_ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
 WEATHER_FORECAST_DAYS = 16  # fenêtre maximale de l'API forecast
@@ -269,7 +268,7 @@ def _lieu_priority(lieu: str) -> int:
 
 
 NEWS_WINDOW_HOURS = {
-    "matin": 24,  # rattrape le décalage Guadeloupe UTC-4 vs Paris
+    "matin": 24,  # couvre toute la journée précédente
     "midi":   8,  # nouvelles depuis le flash du matin
     "soir":   8,  # nouvelles depuis le flash du midi
 }
@@ -364,7 +363,7 @@ def generate_hashtags(items: list[dict]) -> list[list[str]]:
         f"Pour chaque article ci-dessous, génère exactement {HASHTAG_COUNT} hashtags "
         f"Réponds UNIQUEMENT avec un tableau JSON de tableaux de strings, "
         f"dans le même ordre que les articles. Exemple : "
-        f'[[\"#Haiti\",\"#Caraibes\"],[\"#Sport\",\"#Guadeloupe\"]].\n\n'
+        f'[[\"#Haiti\",\"#Caraibes\"],[\"#Sport\",\"#Drancy\"]].\n\n'
         f"Articles :\n{articles_json}"
     )
     raw = call_mistral(
@@ -402,7 +401,7 @@ def fetch_weather(target_date: Date) -> str:
         "latitude": WEATHER_LAT,
         "longitude": WEATHER_LON,
         "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode,windspeed_10m_max",
-        "timezone": "America/Guadeloupe",
+        "timezone": "Europe/Paris",
         "start_date": date_iso,
         "end_date": date_iso,
     })
@@ -537,7 +536,7 @@ def build_segments(
         n_segs = len(items) + base_segs
         news_block = f"Voici les {len(items)} actualités du jour :\n\n{articles}\n\n"
         outro_template = (
-            f"Voilà pour ce Flash Info Guadeloupe du {date_str}. "
+            f"Voilà pour ce Flash Info Drancy du {date_str}. "
             f"Sources : {sources_str}. "
             f"On se retrouve {rdv}. "
             f"{salut} à toutes et à tous."
@@ -561,7 +560,7 @@ def build_segments(
     meteo_block = ""
     meteo_instruction = ""
     if has_meteo:
-        label_detail = f"prévisions pour demain {tomorrow_str}" if tomorrow_str else "toute la Guadeloupe"
+        label_detail = f"prévisions pour demain {tomorrow_str}" if tomorrow_str else "toute la région parisienne"
         meteo_block = f"{weather_label} ({label_detail}) :\n{weather}\n\n"
         meteo_instr_text = (
             "prévisions météo de demain en style oral — prépare les auditeurs pour la journée de demain"
@@ -573,7 +572,7 @@ def build_segments(
 
     heure_ctx = f" — il est {heure_paris} à Paris" if heure_paris else ""
     user_prompt = (
-        f"Flash info Guadeloupe du {date_str}{heure_ctx} — {edition_instruction}\n\n"
+        f"Flash Info du {date_str}{heure_ctx} — {edition_instruction}\n\n"
         f"{meteo_block}"
         f"{marroniers_block}"
         f"{news_block}"
@@ -640,7 +639,7 @@ def _ensure_sources_in_outro(segments: list[str], sources: list[str]) -> list[st
         import re
         sources_str = " et ".join(sources)
         outro = re.sub(
-            r"(Voilà pour ce Flash Info Guadeloupe[^.]*\.)",
+            r"(Voilà pour ce Flash Info Drancy[^.]*\.)",
             rf"\1 Sources : {sources_str}.",
             outro,
             count=1,
@@ -1197,7 +1196,7 @@ def _update_podcast_rss(
         f"      <itunes:duration>{mins:02d}:{secs:02d}</itunes:duration>\n"
         f"    </item>"
     )
-    artwork = "https://famibelle.github.io/FlashInfoKarukera/artwork.jpg"
+    artwork = "https://famibelle.github.io/FlashInfoDrancy/artwork.jpg"
     items_block = "\n\n".join([new_item] + existing[:199])
     rss_path.parent.mkdir(parents=True, exist_ok=True)
     rss_path.write_text(
@@ -1205,14 +1204,14 @@ def _update_podcast_rss(
         f'<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">\n'
         f'  <channel>\n'
         f'    <title>{channel_title}</title>\n'
-        f'    <link>https://famibelle.github.io/FlashInfoKarukera/</link>\n'
+        f'    <link>https://famibelle.github.io/FlashInfoDrancy/</link>\n'
         f'    <description>{channel_desc}</description>\n'
         f'    <language>fr</language>\n'
         f'    <copyright>© Botiran</copyright>\n'
         f'    <itunes:author>Botiran</itunes:author>\n'
         f'    <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>\n'
         f'    <itunes:image href="{artwork}"/>\n'
-        f'    <image><url>{artwork}</url><title>{channel_title}</title><link>https://famibelle.github.io/FlashInfoKarukera/</link></image>\n'
+        f'    <image><url>{artwork}</url><title>{channel_title}</title><link>https://famibelle.github.io/FlashInfoDrancy/</link></image>\n'
         f'    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>\n'
         f'    <itunes:explicit>no</itunes:explicit>\n\n'
         f'{items_block}\n\n'
@@ -1223,55 +1222,7 @@ def _update_podcast_rss(
     print(f"   📻 RSS mis à jour → {rss_path.name} ({len(existing) + 1} épisodes)")
 
 
-# ── Étape 4 : Publication Buzzsprout → Spotify ───────────────────────────────
 
-BUZZSPROUT_TAGS = "Guadeloupe, actualité, flash info, Antilles, Caraïbes, France-Antilles, info locale"
-
-def publish_buzzsprout(audio_path: Path, title: str, description: str, tags: str) -> tuple[str, str]:
-    print(f"🎙️  Publication Buzzsprout (podcast {BUZZSPROUT_PODCAST_ID})...")
-    cmd = [
-        "curl", "-s",
-        "-H", f"Authorization: Token token={BUZZSPROUT_API_TOKEN}",
-        "-F", f"title={title}",
-        "-F", f"description={description}",
-        "-F", f"tags={tags}",
-        "-F", "explicit=false",
-        "-F", "private=false",
-        "-F", f"audio_file=@{audio_path};type=audio/mpeg",
-        f"https://www.buzzsprout.com/api/{BUZZSPROUT_PODCAST_ID}/episodes.json",
-    ]
-    proc = subprocess.run(cmd, capture_output=True, timeout=120)
-    if proc.returncode != 0:
-        raise RuntimeError(f"curl error: {proc.stderr.decode()}")
-    result = json.loads(proc.stdout)
-
-    episode_url = result.get("url", "")
-    audio_url = result.get("audio_url", "") or ""
-    episode_id = result.get("id", "")
-    print(f"   Épisode publié ✅  id={episode_id}  url={episode_url}")
-
-    # Buzzsprout traite l'audio de façon asynchrone — on attend l'audio_url
-    if not audio_url and episode_id and BUZZSPROUT_API_TOKEN and BUZZSPROUT_PODCAST_ID:
-        import time as _time
-        for _ in range(8):
-            _time.sleep(15)
-            r = subprocess.run([
-                "curl", "-s",
-                "-H", f"Authorization: Token token={BUZZSPROUT_API_TOKEN}",
-                f"https://www.buzzsprout.com/api/{BUZZSPROUT_PODCAST_ID}/episodes/{episode_id}.json",
-            ], capture_output=True, timeout=30)
-            if r.returncode == 0:
-                ep = json.loads(r.stdout)
-                audio_url = ep.get("audio_url", "") or ""
-                if audio_url:
-                    print(f"   🔗 audio_url Buzzsprout : {audio_url}")
-                    break
-            _time.sleep(5)
-
-    return episode_url, audio_url
-
-    return url
-    return url
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -1279,11 +1230,11 @@ def publish_buzzsprout(audio_path: Path, title: str, description: str, tags: str
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "Flash info Guadeloupe — génère automatiquement un bulletin audio à partir\n"
+            "Flash Info — génère automatiquement un bulletin audio à partir\n"
             "des flux RSS locaux et de la météo Open-Meteo, rédigé par Madelaine (Mistral)\n"
-            "et synthétisé en MP3 via Voxtral TTS, puis diffusé sur Buzzsprout.\n\n"
+            "et synthétisé en MP3 via Voxtral TTS.\n\n"
             "Workflow : Collecte RSS → Météo → Rédaction Madelaine → TTS par segment\n"
-            "           → Assemblage FFmpeg avec stinger → Buzzsprout"
+            "           → Assemblage FFmpeg avec stinger"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -1427,7 +1378,7 @@ def main():
                 print(f"❌ Format de date invalide : '{args.date}'. Attendu : YYYY-MM-DD", file=sys.stderr)
                 sys.exit(1)
         else:
-            check_date = datetime.now(GUADELOUPE_TZ).date()
+            check_date = datetime.now(DRANCY_TZ).date()
 
         print(f"🔍 Vérification des flux RSS pour le {_date_fr(check_date)}…\n")
         ok, ko = [], []
@@ -1459,9 +1410,9 @@ def main():
             sys.exit(1)
         return
 
-    now_gwada = datetime.now(GUADELOUPE_TZ)
+    now_drancy = datetime.now(DRANCY_TZ)
     heure_paris = _now_paris_str("%Hh%M")
-    print(f"🕐 Heure locale Guadeloupe : {_date_fr(now_gwada.date())} — {now_gwada.strftime('%H:%M')} (UTC{now_gwada.strftime('%z')[:3]}:{now_gwada.strftime('%z')[3:]})")
+    print(f"🕐 Heure locale Drancy : {_date_fr(now_drancy.date())} — {now_drancy.strftime('%H:%M')} (UTC{now_drancy.strftime('%z')[:3]}:{now_drancy.strftime('%z')[3:]})")
 
     edition = args.edition or _detect_edition()
     print(f"📻  Édition : {edition.upper()}")
@@ -1473,7 +1424,7 @@ def main():
             print(f"❌ Format de date invalide : '{args.date}'. Attendu : YYYY-MM-DD", file=sys.stderr)
             sys.exit(1)
     else:
-        target_date = now_gwada.date()
+        target_date = now_drancy.date()
 
     tomorrow = target_date + timedelta(days=1)
     now = datetime.combine(target_date, datetime.min.time())
@@ -1636,7 +1587,7 @@ def main():
     if items:
         save_used_titles(target_date, [it["title"] for it in items])
 
-    title      = f"Flash Info Guadeloupe — {date_str}, édition du {edition}"
+    title      = f"Flash Info Drancy — {date_str}, édition du {edition}"
     intro_text = segments[0].strip() if segments else ""
 
     # ── Backblaze B2 — audio ──────────────────────────────────────────────────
@@ -1645,7 +1596,7 @@ def main():
 
     # ── GitHub Releases — audio public ───────────────────────────────────────
     gh_tag = f"flash-info-{target_date.strftime('%Y-%m')}"
-    gh_release_name = f"Flash Info Guadeloupe — {target_date.strftime('%B %Y')}"
+    gh_release_name = f"Flash Info Drancy — {target_date.strftime('%B %Y')}"
 
     if args.dry_run:
         print(f"--dry-run : audio généré. Arrêt avant Buzzsprout.")
@@ -1658,22 +1609,17 @@ def main():
     headlines = "\n".join(f"• {item['title']}" for item in items)
     sources_line = " | ".join(sources) if sources else "médias locaux"
     description = (
-        f"Flash info du {date_str} — l'essentiel de l'actualité en Guadeloupe en moins de 2 minutes.\n\n"
+        f"Flash info du {date_str} — l'essentiel de l'actualité à Drancy en moins de 2 minutes.\n\n"
         f"Au programme :\n{headlines}\n\n"
         f"Informations issues de : {sources_line}"
     )
-    tags = BUZZSPROUT_TAGS
-
-    # Étape 5 — Buzzsprout → Spotify
-    episode_url, bz_audio_url = publish_buzzsprout(output_path, title, description, tags)
-
-    # ── Podcast RSS — Buzzsprout > B2 ───────────────────────────────────────────
+    # ── Podcast RSS ───────────────────────────────────────────────────────────
     podcast_audio_url = gh_audio_url or bz_audio_url or b2_audio_url
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
-            channel_title="Karukera — Flash Info",
-            channel_desc="Flash info de la Guadeloupe — matin, midi et soir par Botiran",
+            channel_title="Drancy — Flash Info",
+            channel_desc="Flash info de Drancy — matin, midi et soir par Botiran",
             episode_title=title,
             episode_desc=intro_text,
             audio_url=podcast_audio_url,

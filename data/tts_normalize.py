@@ -1,6 +1,6 @@
 """Données de normalisation textuelle appliquées avant l'appel TTS Voxtral."""
 
-# Prononciations locales guadeloupéennes (forme écrite → forme orale pour le TTS)
+# Prononciations locales parisiennes (forme écrite → forme orale pour le TTS)
 PRONONCIATIONS_LOCALES = {
     # Prononciations créoles
     
@@ -39,12 +39,12 @@ PRONONCIATIONS_LOCALES = {
     "SDIS": "Service Départemental d'Incendie et de Secours",
     "S.D.I.S": "Service Départemental d'Incendie et de Secours",
     "S.D.I.S.": "Service Départemental d'Incendie et de Secours",
-    "SMGEAG" : "Syndicat Mixte de Gestion de l'Eau et de l'Assainissement de Guadeloupe",
-    "S.M.G.E.A.G" : "Syndicat Mixte de Gestion de l'Eau et de l'Assainissement de Guadeloupe",
+    "SMGEAG" : "Syndicat Mixte de Gestion de l'Eau et de l'Assainissement de ",
+    "S.M.G.E.A.G" : "Syndicat Mixte de Gestion de l'Eau et de l'Assainissement de ",
     "MGEN":    "Mutuelle Générale de l'éducation Nationale",
     "M.G.E.N": "mutuelle générale éducation nationale",
     "M.G.E.N.": "mutuelle générale éducation nationale",
-    # Clubs sportifs guadeloupéens – athlétisme
+    # Clubs sportifs parisiens – athlétisme
     "ACBM":    "Athlétic Club de Baie-Mahault",
     "ACCBE":   "Athlétic Club de Capesterre-Belle-Eau",
     "ACSA":    "Athlétic Club de Sainte-Anne",
@@ -69,25 +69,25 @@ PRONONCIATIONS_LOCALES = {
     "USBM":    "Union Sportive de Baie-Mahault",
     "USGB":    "Union Sportive de Grand-Bourg de Marie-Galante",
     "USR Athlé": "Unité Sainte-Rosienne Athlétisme de Sainte-Rose",
-    # Clubs sportifs guadeloupéens – cyclisme
+    # Clubs sportifs parisiens – cyclisme
     "ACVPB":   "Association Cycliste de Petit-Bourg",
     "APCR":    "Amicale du Personnel du Conseil Régional Cyclotourisme",
     "ASVO":    "Association Sportive Vélo d'Or",
     "CCB":     "Citizen Club de Baillif",
     "CCBT":    "Citizen Club de Basse-Terre",
     "CCSBT":   "Club Cycliste du Sud Basse-Terre",
-    "CRCIG":   "Comité Régional de Cyclisme des Îles de Guadeloupe",
+    "CRCIG":   "Comité Régional de Cyclisme des Îles de ",
     "UCM":     "Union Cycliste Moulienne",
     "VCN":     "Vélo Club du Nord d'Anse-Bertrand",
     "VCTR":    "Vélo Club de Trois-Rivières",
     "VO2C":    "Vélo d'Or du Centre et de la Caraïbe",
-    # Clubs sportifs guadeloupéens – multi-sports
+    # Clubs sportifs parisiens – multi-sports
     "AOG":     "Association Omnisports Gourbeyrienne de Gourbeyre",
     "CERAL":   "Cercle d'Études, de Recherche et d'Animation du Lamentin",
     "MTC":     "Moule Triathlon Club du Moule",
     # Instances fédérales
     "LGA":     "Ligue Guadeloupéenne d'Athlétisme",
-    "LRAG":    "Ligue Régionale d'Athlétisme de la Guadeloupe",
+    "LRAG":    "Ligue Régionale d'Athlétisme de la ",
     "LGF":     "Ligue Guadeloupéenne de Football",
 }
 
