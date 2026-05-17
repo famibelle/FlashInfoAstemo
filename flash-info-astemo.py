@@ -1492,11 +1492,16 @@ def main():
     now = datetime.combine(target_date, datetime.min.time())
     date_str = _date_fr(target_date)
 
-    # Étape 1 — Collecte RSS avec filtre anti-répétition
-    used_titles = load_used_titles(target_date)
-    if used_titles:
-        print(f"🔁  Anti-répétition : {len(used_titles)} titre(s) déjà diffusé(s) aujourd'hui")
-    items = fetch_news(RSS_FEEDS, MAX_ITEMS, target_date, edition=edition, exclude_titles=used_titles or None)
+    # Étape 1 — Collecte RSS avec filtre anti-répétition (7 jours)
+    # Charger les titres des 7 derniers jours pour éviter les répétitions
+    all_used_titles = set()
+    for i in range(7):  # Mémoire de 7 jours
+        date_to_check = target_date - timedelta(days=i)
+        all_used_titles.update(load_used_titles(date_to_check))
+    
+    if all_used_titles:
+        print(f"🔁  Anti-répétition : {len(all_used_titles)} titre(s) déjà diffusé(s) (7 derniers jours)")
+    items = fetch_news(RSS_FEEDS, MAX_ITEMS, target_date, edition=edition, exclude_titles=all_used_titles or None)
     if not items:
         print(f"⚠️  Aucune actualité pour le {date_str} — flash météo uniquement.")
 
