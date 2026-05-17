@@ -56,10 +56,18 @@ jobs:
         run: |
           rm -f /tmp/flash_info_output/_seg_*.mp3 /tmp/flash_info_output/_seg_*_p.mp3 2>/dev/null || true
 
+      - name: Verify Mistral API key
+        run: |
+          if [ -z "${{ secrets.MISTRAL_API_KEY_ASTEMO }}" ]; then
+            echo "❌ ERREUR: Le secret 'MISTRAL_API_KEY_ASTEMO' n'est pas défini dans GitHub Settings → Secrets"
+            echo "   → Va sur: https://github.com/famibelle/FlashInfoAstemo/settings/secrets/actions"
+            exit 1
+          fi
+          echo "✅ Clé Mistral API vérifiée"
+
       - name: Verify environment
         run: |
           echo "✅ Vérification de l'environnement..."
-          [ -n "${{ secrets.MISTRAL_API_KEY_ASTEMO }}" ] || { echo "❌ MISTRAL_API_KEY_ASTEMO manquant"; exit 1; }
           command -v ffmpeg >/dev/null 2>&1 || { echo "❌ ffmpeg non installé"; exit 1; }
           command -v ffprobe >/dev/null 2>&1 || { echo "❌ ffprobe non installé"; exit 1; }
           echo "✅ Environnement valide"
