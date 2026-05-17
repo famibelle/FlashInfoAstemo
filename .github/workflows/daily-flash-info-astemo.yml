@@ -64,6 +64,7 @@ jobs:
           if [ -n "$(git status --porcelain docs/audio/)" ]; then
             git add docs/audio/
             git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
+            git pull --rebase origin main
             git push origin main
             
             # Mettre à jour le RSS pour Apple Podcasts
@@ -71,6 +72,7 @@ jobs:
             
             git add docs/podcast.xml
             git commit -m "📻 RSS : nouvel épisode ${DATE}"
+            git pull --rebase origin main
             git push origin main
           else
             echo "No audio files generated"
