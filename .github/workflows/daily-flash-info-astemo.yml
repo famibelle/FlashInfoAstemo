@@ -31,8 +31,7 @@ jobs:
            
       - name: Generate Flash Info MP3
         env:
-          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
-          VOXTRALE_API_KEY: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
+          MISTRAL_API_KEY_ASTEMO: ${{ secrets.MISTRAL_API_KEY_ASTEMO }}
         run: |
           DATE=$(date +'%Y%m%d')
           OUTPUT_FILE="docs/audio/flash-info-astemo-${DATE}-matin.mp3"
