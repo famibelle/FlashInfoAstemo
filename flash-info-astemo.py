@@ -81,7 +81,7 @@ ARCHIVE_ACCESS_KEY = os.environ.get("ARCHIVE_ACCESS_KEY", "")
 ARCHIVE_SECRET_KEY = os.environ.get("ARCHIVE_SECRET_KEY", "")
 
 GITHUB_TOKEN     = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO      = "famibelle/FlashInfoDrancy"
+GITHUB_REPO      = "famibelle/FlashInfoFreinage"
 
 OUTPUT_DIR      = Path(tempfile.gettempdir()) / "flash_info_output"
 STINGERS_DIR    = Path(__file__).parent / "Stingers"
@@ -92,7 +92,7 @@ ARCHIVES_DIR    = Path(__file__).parent / "archives" / "flash-info"
 DOCS_DIR        = Path(__file__).parent / "docs"
 PODCAST_RSS_PATH = DOCS_DIR / "podcast.xml"
 BOTIRAN_PROFILE = MEDIA_DIR / "botiran_profile.jpg"
-DRANCY_TZ      = ZoneInfo("Europe/Paris")
+FREINAGE_TZ   = ZoneInfo("Europe/Paris")
 
 # ── Éditions ──────────────────────────────────────────────────────────────────
 
@@ -358,7 +358,7 @@ def generate_hashtags(items: list[dict]) -> list[list[str]]:
         f"Pour chaque article ci-dessous, génère exactement {HASHTAG_COUNT} hashtags "
         f"Réponds UNIQUEMENT avec un tableau JSON de tableaux de strings, "
         f"dans le même ordre que les articles. Exemple : "
-        f'[[\"#Haiti\",\"#Caraibes\"],[\"#Sport\",\"#Drancy\"]].\n\n'
+        f'[[\"#Haiti\",\"#Caraibes\"],[\"#Sport\",\"#Freinage\"]].\n\n'
         f"Articles :\n{articles_json}"
     )
     raw = call_mistral(
@@ -531,7 +531,7 @@ def build_segments(
         n_segs = len(items) + base_segs
         news_block = f"Voici les {len(items)} actualités du jour :\n\n{articles}\n\n"
         outro_template = (
-            f"Voilà pour ce Flash Info Drancy du {date_str}. "
+            f"Voilà pour ce Flash Info Freinage du {date_str}. "
             f"Sources : {sources_str}. "
             f"On se retrouve {rdv}. "
             f"{salut} à toutes et à tous."
@@ -634,7 +634,7 @@ def _ensure_sources_in_outro(segments: list[str], sources: list[str]) -> list[st
         import re
         sources_str = " et ".join(sources)
         outro = re.sub(
-            r"(Voilà pour ce Flash Info Drancy[^.]*\.)",
+            r"(Voilà pour ce Flash Info Freinage[^.]*\.)",
             rf"\1 Sources : {sources_str}.",
             outro,
             count=1,
@@ -1165,7 +1165,7 @@ def _update_podcast_rss(
         f"      <itunes:duration>{mins:02d}:{secs:02d}</itunes:duration>\n"
         f"    </item>"
     )
-    artwork = "https://famibelle.github.io/FlashInfoDrancy/artwork.jpg"
+    artwork = "https://famibelle.github.io/FlashInfoFreinage/artwork.jpg"
     items_block = "\n\n".join([new_item] + existing[:199])
     rss_path.parent.mkdir(parents=True, exist_ok=True)
     rss_path.write_text(
@@ -1173,14 +1173,14 @@ def _update_podcast_rss(
         f'<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">\n'
         f'  <channel>\n'
         f'    <title>{channel_title}</title>\n'
-        f'    <link>https://famibelle.github.io/FlashInfoDrancy/</link>\n'
+        f'    <link>https://famibelle.github.io/FlashInfoFreinage/</link>\n'
         f'    <description>{channel_desc}</description>\n'
         f'    <language>fr</language>\n'
         f'    <copyright>© Botiran</copyright>\n'
         f'    <itunes:author>Botiran</itunes:author>\n'
         f'    <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>\n'
         f'    <itunes:image href="{artwork}"/>\n'
-        f'    <image><url>{artwork}</url><title>{channel_title}</title><link>https://famibelle.github.io/FlashInfoDrancy/</link></image>\n'
+        f'    <image><url>{artwork}</url><title>{channel_title}</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>\n'
         f'    <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>\n'
         f'    <itunes:explicit>no</itunes:explicit>\n\n'
         f'{items_block}\n\n'
@@ -1347,7 +1347,7 @@ def main():
                 print(f"❌ Format de date invalide : '{args.date}'. Attendu : YYYY-MM-DD", file=sys.stderr)
                 sys.exit(1)
         else:
-            check_date = datetime.now(DRANCY_TZ).date()
+            check_date = datetime.now(FREINAGE_TZ).date()
 
         print(f"🔍 Vérification des flux RSS pour le {_date_fr(check_date)}…\n")
         ok, ko = [], []
@@ -1379,9 +1379,9 @@ def main():
             sys.exit(1)
         return
 
-    now_drancy = datetime.now(DRANCY_TZ)
+    now_freinage = datetime.now(FREINAGE_TZ)
     heure_paris = _now_paris_str("%Hh%M")
-    print(f"🕐 Heure locale Drancy : {_date_fr(now_drancy.date())} — {now_drancy.strftime('%H:%M')} (UTC{now_drancy.strftime('%z')[:3]}:{now_drancy.strftime('%z')[3:]})")
+    print(f"🕐 Heure locale Freinage : {_date_fr(now_freinage.date())} — {now_freinage.strftime('%H:%M')} (UTC{now_freinage.strftime('%z')[:3]}:{now_freinage.strftime('%z')[3:]})")
 
     edition = args.edition or _detect_edition()
     print(f"📻  Édition : {edition.upper()}")
@@ -1393,7 +1393,7 @@ def main():
             print(f"❌ Format de date invalide : '{args.date}'. Attendu : YYYY-MM-DD", file=sys.stderr)
             sys.exit(1)
     else:
-        target_date = now_drancy.date()
+        target_date = now_freinage.date()
 
     tomorrow = target_date + timedelta(days=1)
     now = datetime.combine(target_date, datetime.min.time())
@@ -1556,12 +1556,12 @@ def main():
     if items:
         save_used_titles(target_date, [it["title"] for it in items])
 
-    title      = f"Flash Info Drancy — {date_str}, édition du {edition}"
+    title      = f"Flash Info Freinage — {date_str}, édition du {edition}"
     intro_text = segments[0].strip() if segments else ""
 
     # ── GitHub Releases — audio public ───────────────────────────────────────
     gh_tag = f"flash-info-{target_date.strftime('%Y-%m')}"
-    gh_release_name = f"Flash Info Drancy — {target_date.strftime('%B %Y')}"
+    gh_release_name = f"Flash Info Freinage — {target_date.strftime('%B %Y')}"
 
     if args.dry_run:
         print(f"--dry-run : audio généré. Arrêt avant Buzzsprout.")
@@ -1574,7 +1574,7 @@ def main():
     headlines = "\n".join(f"• {item['title']}" for item in items)
     sources_line = " | ".join(sources) if sources else "médias locaux"
     description = (
-        f"Flash info du {date_str} — l'essentiel de l'actualité à Drancy en moins de 2 minutes.\n\n"
+        f"Flash info du {date_str} — l'essentiel de l'actualité à Freinage en moins de 2 minutes.\n\n"
         f"Au programme :\n{headlines}\n\n"
         f"Informations issues de : {sources_line}"
     )
@@ -1583,8 +1583,8 @@ def main():
     if podcast_audio_url:
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
-            channel_title="Drancy — Flash Info",
-            channel_desc="Flash info de Drancy — matin, midi et soir par Botiran",
+            channel_title="Freinage — Flash Info",
+            channel_desc="Flash info de Freinage — matin, midi et soir par Botiran",
             episode_title=title,
             episode_desc=intro_text,
             audio_url=podcast_audio_url,
