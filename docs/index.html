@@ -237,7 +237,12 @@
                 ${durationStr ? `<span style="margin-left: 1rem;">⏱️ ${durationStr}</span>` : ''}
               </p>
               <p style="color: #a0a5b5; font-size: 0.85rem; line-height: 1.5;">${cleanDesc}</p>
-              ${audioUrl ? `<a href="${audioUrl}" download style="display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding: 0.4rem 0.8rem; background: #1a1d27; border: 1px solid #333646; border-radius: 6px; color: #4ade80; font-size: 0.8rem; text-decoration: none;">
+              ${audioUrl ? `
+              <audio controls style="width: 100%; margin-top: 0.75rem; border-radius: 8px;">
+                <source src="${audioUrl}" type="audio/mpeg">
+                Ton navigateur ne supporte pas l'élément audio.
+              </audio>
+              <a href="${audioUrl}" download style="display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; padding: 0.4rem 0.8rem; background: #1a1d27; border: 1px solid #333646; border-radius: 6px; color: #4ade80; font-size: 0.8rem; text-decoration: none;">
                 <span>📥</span><span>Télécharger</span>
               </a>` : ''}
             </div>
