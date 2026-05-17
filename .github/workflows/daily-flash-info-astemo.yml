@@ -86,11 +86,11 @@ jobs:
             git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
             git push origin main
             
-            # Mettre à jour le RSS pour Apple Podcasts
+            # Mettre à jour le RSS pour Apple Podcasts (regénère tout le flux)
             python scripts/update_rss.py
             
             git add docs/podcast.xml
-            git commit -m "📻 RSS : nouvel épisode ${DATE}"
+            git commit -m "📻 RSS : régénération complète du flux"
             git push origin main
           else
             echo "No audio files generated"
