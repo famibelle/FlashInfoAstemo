@@ -20,6 +20,7 @@ _update_podcast_rss = flash_info_astemo['_update_podcast_rss']
 
 def main():
     date_str = os.environ.get('DATE', datetime.utcnow().strftime('%Y%m%d'))
+    catchy_title = os.environ.get('CATCHY_TITLE', f'L actualite du Freinage - {datetime.utcnow().strftime("%Y-%m-%d")}, edition du matin')
     
     now = datetime.utcnow()
     date_formatted = now.strftime('%A %d %B %Y')
@@ -35,8 +36,8 @@ def main():
         rss_path=Path('docs/podcast.xml'),
         channel_title='L\'actualité du Freinage',
         channel_desc='L\'actualité du Freinage - matin, midi et soir par MadelAIne',
-        episode_title=f'L\'actualité du Freinage - {date_formatted}, edition du matin',
-        episode_desc=f'Flash info du {now.strftime("%Y-%m-%d")} - l essentiel de l actualite du freinage en moins de 2 minutes.',
+        episode_title=catchy_title,
+        episode_desc=f'Flash info du {now.strftime("%Y-%m-%d")} - {catchy_title}. l essentiel de l actualite du freinage en moins de 2 minutes.',
         audio_url=audio_url,
         audio_size=file_path.stat().st_size,
         duration_s=0,

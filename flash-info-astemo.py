@@ -98,7 +98,7 @@ FREINAGE_TZ   = ZoneInfo("Europe/Paris")
 
 _EDITION_INTRO_INSTRUCTION = {
     "matin": (
-        "ÉDITION DU MATIN — Intro : commence par 'Bèl bonjou' — ton chaleureux et "
+        "ÉDITION DU MATIN — Intro : commence par 'Bonjour' — ton chaleureux et "
         "énergique de début de matinée, comme on démarre ensemble la journée."
     ),
     "midi": (
@@ -113,7 +113,7 @@ _EDITION_INTRO_INSTRUCTION = {
 }
 
 _EDITION_OUTRO = {
-    "matin": ("Bonne journée",      "ce midi pour une nouvelle édition"),
+    "matin": ("Bonne journée",      "à demain pour une nouvelle édition"),
     "midi":  ("Bonne après-midi",   "ce soir pour les prévisions et les dernières infos"),
     "soir":  ("Bonne soirée",       "demain matin pour démarrer la journée"),
 }
@@ -1196,6 +1196,37 @@ def _update_podcast_rss(
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def _generate_catchy_title(items: list[dict], edition: str, date_str: str) -> str:
+    """Génère un titre accrocheur via Mistral LLM à partir des actualités."""
+    if not items:
+        return f"L'actualité du Freinage — {date_str}, édition du {edition}"
+    
+    articles_list = "\n".join(f"- {item['title']}" for item in items[:5])  # Top 5 articles
+    
+    prompt = (
+        f"Tu es un rédacteur en chef spécialisé dans le freinage automobile et la mobilité.\n"
+        f"À partir des actualités suivantes, invente un titre ACCROCHEUR, PERCUTANT et PROFESSIONNEL\n"
+        f"(max 60 caractères) pour un flash info du {edition}.\n\n"
+        f"Actualités :\n{articles_list}\n\n"
+        f"Réponds UNIQUEMENT avec le titre, sans guillemets, sans points, sans retour à la ligne."
+    )
+    
+    try:
+        title = call_mistral(
+            system="Tu es un assistant strict qui répond uniquement avec le texte demandé, sans ajout.",
+            user=prompt,
+            temperature=0.8,
+            max_tokens=100,
+        )
+        # Nettoyer le résultat
+        title = title.strip().strip('"').strip("'").strip()
+        # Limiter à 60 caractères
+        return title[:60] if title else f"L'actualité du Freinage — {date_str}"
+    except Exception as e:
+        print(f"   ⚠️  Génération titre accrocheur échouée : {e}")
+        return f"L'actualité du Freinage — {date_str}, édition du {edition}"
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=(
@@ -1447,6 +1478,13 @@ def main():
         print("══════════════════════════════════════════════════════════")
         print(f"  {weather}")
         print("══════════════════════════════════════════════════════════\n")
+
+    # Générer un titre accrocheur via LLM
+    catchy_title = _generate_catchy_title(items, edition, date_str) if items else f"L'actualité du Freinage — {date_str}, édition du {edition}"
+    print(f"🎯 Titre accrocheur : {catchy_title}")
+    
+    # Exporter pour utilisation par update_rss.py
+    os.environ["CATCHY_TITLE"] = catchy_title
 
     segments_madelaine = build_segments(
         items, date_str, weather, sources,
