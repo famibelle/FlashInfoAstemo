@@ -3,7 +3,7 @@
   <channel>
     <title>L'actualité du Freinage</title>
     <link>https://famibelle.github.io/FlashInfoFreinage/</link>
-    <description>L'actualité du Freinage — matin, midi et soir par Botiran</description>
+    <description>L'actualité du Freinage - matin, midi et soir par MadelAIne</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
@@ -12,6 +12,25 @@
     <image><url>https://famibelle.github.io/FlashInfoFreinage/artwork.jpg</url><title>L'actualité du Freinage</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>
     <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
     <itunes:explicit>no</itunes:explicit>
-    <itunes:type>episodic</itunes:type>
+
+    <item>
+      <title>L'actualité du Freinage - Sunday 17 May 2026, edition du matin</title>
+      <description><![CDATA[Flash info du 2026-05-17 - l essentiel de l actualite du freinage en moins de 2 minutes.]]></description>
+      <pubDate>Sun, 17 May 2026 19:42:50 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1770240" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
+      <itunes:duration>00:00</itunes:duration>
+    </item>
+
+<item>
+      <title>L'actualité du Freinage — dimanche 17 mai 2026, édition du matin</title>
+      <description><![CDATA[Bèl bonjou à toutes et à tous, nous sommes le dimanche 17 mai 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : les pièces frein du Subaru Uncharted 2026, une simulation de conduite plus accessible pour les équipes de compétition, et les dernières innovations en prototypes intelligents.
+C'est parti.]]></description>
+      <pubDate>Sun, 17 May 2026 19:42:48 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1770240" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
+      <itunes:duration>00:00</itunes:duration>
+    </item>
+
   </channel>
 </rss>
