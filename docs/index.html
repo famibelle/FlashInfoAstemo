@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Madelaine — Flash Info Freinage</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e8e8e8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2a2d3a;
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      max-width: 560px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .artwork {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .tagline {
+      font-size: 0.95rem;
+      color: #8b8fa8;
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #252836;
+      border: 1px solid #333646;
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      text-decoration: none;
+      color: #e8e8e8;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background 0.15s, border-color 0.15s;
+      margin-bottom: 0.75rem;
+    }
+
+    .btn:hover {
+      background: #2e3245;
+      border-color: #4a4f6a;
+    }
+
+    .btn-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .btn-text { text-align: left; }
+    .btn-label { display: block; color: #fff; }
+    .btn-sub { display: block; font-size: 0.8rem; color: #8b8fa8; margin-top: 2px; }
+    .btn-arrow { margin-left: auto; color: #555; font-size: 0.9rem; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2a2d3a;
+      margin: 1.5rem 0;
+    }
+
+    .apple-embed {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #555;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .rss-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: #f26522;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    .rss-link:hover { opacity: 0.75; }
+
+    .rss-icon { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .badge {
+      display: inline-block;
+      background: #1e3a2f;
+      color: #4ade80;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+
+    /* Share buttons */
+    .share-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: #252836;
+      border: 1px solid #333646;
+      border-radius: 8px;
+      padding: 0.45rem 0.75rem;
+      color: #b0b4cc;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      text-decoration: none;
+    }
+    .share-btn:hover {
+      background: #2e3245;
+      color: #e8e8e8;
+      border-color: #444;
+    }
+    .share-btn:active { transform: scale(0.95); }
+    .share-icon { font-size: 1rem; flex-shrink: 0; }
+    .share-text {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="artwork.jpg" alt="Madelaine — Flash Info Freinage" class="artwork">
+    <h1>Madelaine</h1>
+    <p class="tagline">Flash Info Freinage — L'actualité du freinage et de la mobilité<br>Matin, midi et soir — par Madelaine</p>
+
+    <hr class="divider">
+
+    <a href="podcast.xml" class="btn">
+      <span class="btn-icon">🎙️</span>
+      <span class="btn-text">
+        <span class="btn-label">Podcast RSS</span>
+        <span class="btn-sub">Flux des épisodes</span>
+      </span>
+      <span class="btn-arrow">›</span>
+    </a>
+
+    <hr class="divider">
+
+    <a href="https://github.com/famibelle/FlashInfoFreinage" class="btn" target="_blank" rel="noopener">
+      <span class="btn-icon">💻</span>
+      <span class="btn-text">
+        <span class="btn-label">Code source</span>
+        <span class="btn-sub">GitHub — Flash Info Freinage</span>
+      </span>
+      <span class="btn-arrow">›</span>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    <a href="podcast.xml" class="rss-link">
+      <svg class="rss-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 3a1 1 0 0 0 0 2c8.837 0 16 7.163 16 16a1 1 0 1 0 2 0C21 11.058 12.942 3 3 3zm0 6a1 1 0 0 0 0 2c5.514 0 10 4.486 10 10a1 1 0 1 0 2 0c0-6.617-5.383-12-12-12zm1 9a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+      </svg>
+      Flux RSS Podcast <span class="badge">LIVE</span>
+    </a>
+    <span>© Botiran — Flash Info Freinage</span>
+  </div>
+</body>
+</html>
