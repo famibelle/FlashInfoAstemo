@@ -192,25 +192,6 @@ _FR_DAYS = {
 }
 
 
-_LIEUX_MONDE_LOWER = {l.lower(): l for l in _LIEUX_MONDE}
-
-def _extract_lieu(title: str, desc: str) -> str:
-    """
-    Cherche un lieu géographique dans title + desc.
-    Priorité : commune guadeloupéenne → pays/ville mondiale → N/A.
-    """
-    import re
-    haystack = f"{title} {desc}".lower()
-
-    def _match(mapping: dict) -> str | None:
-        for lieu_low, lieu_orig in mapping.items():
-            pat = r"(?<![a-zàâéèêëîïôùûüç])" + re.escape(lieu_low) + r"(?![a-zàâéèêëîïôùûüç])"
-            if re.search(pat, haystack):
-                return lieu_orig
-        return None
-
-    return _match(_LIEUX_MONDE_LOWER) or "N/A"
-
 
 def _date_fr(d: Date) -> str:
     """Retourne ex: 'samedi 19 avril 2026'."""
@@ -281,15 +262,10 @@ def _parse_feed_items(root: ET.Element, cutoff: datetime) -> list[tuple]:
 
     return results
 
-_LIEUX_GUADELOUPE_SET = {l.lower() for l in _LIEUX_GUADELOUPE} | {"guadeloupe", "karukera"}
 
 def _lieu_priority(lieu: str) -> int:
-    """0 = local Guadeloupe, 1 = lieu inconnu (N/A), 2 = international."""
-    if lieu.lower() in _LIEUX_GUADELOUPE_SET:
-        return 0
-    if lieu == "N/A":
-        return 1
-    return 2
+    """Toujours 1 car lieu = N/A."""
+    return 1
 
 
 NEWS_WINDOW_HOURS = {
@@ -323,7 +299,7 @@ def fetch_news(feeds: list[str], max_items: int, target_date: Date, edition: str
         {
             "title": t, "date": d, "desc": desc,
             "source": next((s.name for s in RSS_SOURCES if s.url == feed_url), feed_url.split("/")[2].capitalize()),
-            "lieu": _extract_lieu(t, desc),
+            "lieu": "N/A",
             "category": _FEED_CATEGORY.get(feed_url, "general"),
         }
         for _, t, d, desc, feed_url in all_items
