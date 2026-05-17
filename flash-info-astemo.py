@@ -699,8 +699,6 @@ def build_segments(
     user_prompt = (
         f"Flash info Guadeloupe du {date_str}{heure_ctx} — {edition_instruction}\n\n"
         f"{meteo_block}"
-        f"{prenoms_block}"
-        f"{communes_block}"
         f"{marroniers_block}"
         f"{horoscope_block}"
         f"{news_block}"
