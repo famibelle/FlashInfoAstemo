@@ -49,5 +49,14 @@
       <itunes:duration>03:09</itunes:duration>
     </item>
 
+    <item>
+      <title>Subaru 2026 : L’innovation qui freine les limites</title>
+      <description><![CDATA[Subaru 2026 : des pièces de freinage qui repoussent les limites, prêts à tester ?]]></description>
+      <pubDate>Tue, 12 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260512-matin.mp3" length="1584385" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260512-matin</guid>
+      <itunes:duration>03:23</itunes:duration>
+    </item>
+
   </channel>
 </rss>
