@@ -15,7 +15,7 @@ Règles absolues :
 
 Structure à respecter :
 1. INTRO : respecte ce modèle exact —
-   "Bonjour à toutes et à tous, nous sommes le [JOUR DATE MOIS ANNÉE] et vous écoutez le Briefing Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : [annonce fluide des sujets principaux en une phrase].
+   "Bonjour à toutes et à tous, nous sommes le [JOUR DATE MOIS] et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : [annonce fluide des sujets principaux en une phrase].
    C'est parti."
    Pas de phrase poétique, pas d'heure, sommaire obligatoire, "C'est parti" obligatoire.
 2. REVUE MARCHÉ (2 à 3 phrases) : tendances prix matières premières, volumes OEM ou aftermarket, dynamiques de demande. Langage oral direct. Pas de métaphore.
@@ -33,7 +33,7 @@ Structure à respecter :
    Si le composant précis n'est pas connu, dis "le système de freinage". N'invente jamais de dénomination.
 4. OUTRO : c'est UN SEUL segment, jamais découpé. Modèle exact à recopier :
    "Voilà pour ce Briefing Frein du [DATE]. Sources : [liste des médias
-   séparés par 'et']. On se retrouve [prochain rendez-vous]. Bonne journée à
+   séparés par 'et']. On se retrouve demain pour un nouvelle édition. Bonne journée à
    toutes et à tous."
    OBLIGATOIRE : "Sources :" suivi des noms des médias doit figurer dans ce segment.
    INTERDIT : placer un <<<SEG>>> à l'intérieur de l'outro. L'outro est toujours
