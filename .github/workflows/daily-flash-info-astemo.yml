@@ -10,6 +10,15 @@ on:
         description: 'Date pour les infos (format YYYY-MM-DD). La date du jour si omis.'
         required: false
         default: ''
+      edition:
+        description: 'Édition à générer'
+        required: false
+        type: choice
+        default: 'matin'
+        options:
+          - matin
+          - midi
+          - soir
 
 jobs:
   generate-flash-info:
@@ -17,22 +26,15 @@ jobs:
     permissions:
       contents: write
     timeout-minutes: 30
+    concurrency:
+      group: flash-info-generator
+      cancel-in-progress: true
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          
-      - name: Sync with remote
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git fetch origin
-          git rebase origin/main || {
-            echo "⚠️  Rebase échoué - conflit à résoudre manuellement"
-            exit 1
-          }
           
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -75,23 +77,31 @@ jobs:
             DATE=$(date +'%Y%m%d')
             DATE_ARG=""
           fi
-          OUTPUT_FILE="docs/audio/flash-info-astemo-${DATE}-matin.mp3"
-          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE" --verbose $DATE_ARG
+          EDITION="${{ github.event.inputs.edition || 'matin' }}"
+          OUTPUT_FILE="docs/audio/flash-info-astemo-${DATE}-${EDITION}.mp3"
+          python flash-info-astemo.py --edition "$EDITION" --output "$OUTPUT_FILE" --verbose $DATE_ARG
+          echo "EDITION=${EDITION}" >> $GITHUB_ENV
           echo "DATE=${DATE}" >> $GITHUB_ENV
            
-      - name: Update podcast RSS and push
+      - name: Configure Git
         run: |
-          if [ -n "$(git status --porcelain docs/audio/)" ]; then
-            git add docs/audio/
-            git commit -m "🎙️ Daily Flash Info audio files - ${DATE}"
-            git push origin main
-            
-            # Mettre à jour le RSS pour Apple Podcasts (regénère tout le flux)
-            python scripts/update_rss.py
-            
-            git add docs/podcast.xml
-            git commit -m "📻 RSS : régénération complète du flux"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Generate and push
+        run: |
+          # Générer l'audio
+          python flash-info-astemo.py --edition "$EDITION" --output "$OUTPUT_FILE" --verbose $DATE_ARG
+          
+          # Générer le RSS (regénère tout le flux)
+          python scripts/update_rss.py
+          
+          # Commit tout d'un coup
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "🎙️ Flash Info ${DATE} - ${EDITION}"
+            git pull --rebase origin main
             git push origin main
           else
-            echo "No audio files generated"
+            echo "No changes to commit"
           fi
