@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
   <channel>
-    <title>Drancy — Flash Info</title>
-    <link>https://famibelle.github.io/FlashInfoDrancy/</link>
-    <description>Flash info de Drancy — matin, midi et soir par Botiran</description>
+    <title>Freinage — Flash Info</title>
+    <link>https://famibelle.github.io/FlashInfoFreinage/</link>
+    <description>Flash info de Freinage — matin, midi et soir par Botiran</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
     <itunes:owner><itunes:name>Botiran</itunes:name><itunes:email>medhi.famibelle@outlook.fr</itunes:email></itunes:owner>
-    <itunes:image href="https://famibelle.github.io/FlashInfoDrancy/artwork.jpg"/>
-    <image><url>https://famibelle.github.io/FlashInfoDrancy/artwork.jpg</url><title>Drancy — Flash Info</title><link>https://famibelle.github.io/FlashInfoDrancy/</link></image>
+    <itunes:image href="https://famibelle.github.io/FlashInfoFreinage/artwork.jpg"/>
+    <image><url>https://famibelle.github.io/FlashInfoFreinage/artwork.jpg</url><title>Freinage — Flash Info</title><link>https://famibelle.github.io/FlashInfoFreinage/</link></image>
     <itunes:category text="News"><itunes:category text="Daily News"/></itunes:category>
     <itunes:explicit>no</itunes:explicit>
+    <itunes:type>episodic</itunes:type>
   </channel>
 </rss>
