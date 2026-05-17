@@ -179,6 +179,13 @@
     </iframe>
     <!-- Fin Apple Podcasts Embed -->
 
+    <!-- Liste des épisodes -->
+    <hr class="divider">
+    <h2 style="color: #fff; font-size: 1.1rem; margin-bottom: 1rem;">🎙️ Derniers épisodes</h2>
+    <div id="episodes-list" style="text-align: left; margin-bottom: 1.5rem;">
+      <p style="color: #8b8fa8; font-size: 0.9rem;">Chargement des épisodes...</p>
+    </div>
+
     <a href="podcast.xml" class="btn">
       <span class="btn-icon">🎙️</span>
       <span class="btn-text">
@@ -200,6 +207,75 @@
     </a>
 
   </div>
+
+  <script>
+  async function loadEpisodes() {
+    try {
+      const response = await fetch('podcast.xml');
+      const text = await response.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(text, 'text/xml');
+      const items = xmlDoc.querySelectorAll('item');
+
+      const episodesList = document.getElementById('episodes-list');
+
+      if (items.length === 0) {
+        episodesList.innerHTML = '<p style="color: #8b8fa8; font-size: 0.9rem;">Aucun épisode disponible pour le moment.</p>';
+        return;
+      }
+
+      let html = '';
+      items.forEach((item) => {
+        const title = item.querySelector('title')?.textContent || 'Épisode sans titre';
+        const pubDate = item.querySelector('pubDate')?.textContent || '';
+        const description = item.querySelector('description')?.textContent || '';
+        const enclosure = item.querySelector('enclosure');
+        const audioUrl = enclosure?.getAttribute('url') || '';
+        const duration = item.querySelector('duration')?.textContent || '';
+
+        const dateObj = new Date(pubDate);
+        const dateStr = dateObj.toLocaleDateString('fr-FR', {
+          weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+        });
+
+        let durationStr = '';
+        if (duration) {
+          const [h, m, s] = duration.split(':').map(Number);
+          durationStr = h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+
+        const cleanDesc = description.replace(/<!\[CDATA\[|\]\]>/g, '');
+
+        html += `
+        <div style="margin-bottom: 1.25rem; padding: 1rem; background: #252836; border-radius: 8px; border: 1px solid #333646;">
+          <div style="display: flex; gap: 1rem;">
+            <span style="font-size: 1.5rem;">🎙️</span>
+            <div style="flex: 1;">
+              <h3 style="color: #fff; font-size: 1rem; margin-bottom: 0.4rem;">${title}</h3>
+              <p style="color: #8b8fa8; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                <span>📅 ${dateStr}</span>
+                ${durationStr ? `<span style="margin-left: 1rem;">⏱️ ${durationStr}</span>` : ''}
+              </p>
+              <p style="color: #a0a5b5; font-size: 0.85rem; line-height: 1.5;">${cleanDesc}</p>
+              ${audioUrl ? `<a href="${audioUrl}" download style="display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; padding: 0.4rem 0.8rem; background: #1a1d27; border: 1px solid #333646; border-radius: 6px; color: #4ade80; font-size: 0.8rem; text-decoration: none;">
+                <span>📥</span><span>Télécharger</span>
+              </a>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+      });
+
+      episodesList.innerHTML = html;
+    } catch (error) {
+      document.getElementById('episodes-list').innerHTML = `
+      <p style="color: #ff6b6b; font-size: 0.9rem;">⚠️ Impossible de charger les épisodes</p>
+    `;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadEpisodes);
+  </script>
 
   <div class="footer">
     <a href="podcast.xml" class="rss-link">
