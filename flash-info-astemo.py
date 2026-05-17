@@ -545,7 +545,7 @@ def call_mistral(
         MISTRAL_CHAT_URL,
         data=json.dumps(payload).encode(),
         headers={
-            "Authorization": f"Bearer {MISTRAL_API_KEY_ASTEMO_ASTEMO}",
+            "Authorization": f"Bearer {MISTRAL_API_KEY_ASTEMO}",
             "Content-Type": "application/json",
         },
     )
