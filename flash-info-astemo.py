@@ -586,10 +586,6 @@ def _strip_markdown(text: str) -> str:
 
 NOMINIS_API = "https://nominis.cef.fr/json/nominis.php"
 
-def get_communes_du_jour(target_date: "Date") -> list[str]:
-    """Retourne les communes de Guadeloupe fêtant leur fête patronale à la date donnée."""
-    key = target_date.strftime("%m-%d")
-    return _COMMUNES_FETES_PATRONALES.get(key, [])
 
 
 def fetch_prenom_du_jour(target_date: "datetime.date") -> "list[str] | None":
@@ -678,9 +674,6 @@ def build_segments(
         label_prenom = "PRÉNOM DE DEMAIN" if edition == "soir" else "PRÉNOM DU JOUR"
         prenoms_block = f"{label_prenom} : {' et '.join(prenoms_du_jour)}\n\n"
 
-    communes_block = ""
-    if communes_du_jour:
-        communes_block = f"FÊTE PATRONALE DU JOUR : {' et '.join(communes_du_jour)}\n\n"
 
     marroniers_block = ""
     if marroniers_du_jour:
@@ -1810,11 +1803,7 @@ def main():
         print(f"📅  Édition soir : prénoms et communes pour demain ({_date_fr(tomorrow)})")
     if edition != "midi":
         prenoms_du_jour  = fetch_prenom_du_jour(prenoms_date)
-        communes_du_jour = get_communes_du_jour(prenoms_date) or None
-        if communes_du_jour:
-            print(f"⛪  Fête patronale {'de demain' if edition == 'soir' else 'du jour'} : {', '.join(communes_du_jour)}")
-    else:
-        prenoms_du_jour = communes_du_jour = None
+        prenoms_du_jour = None
 
     marroniers_du_jour = _get_marroniers_du_jour(target_date) or None
     if marroniers_du_jour:
@@ -1835,7 +1824,6 @@ def main():
         horoscope=horoscope,
         horoscope_signs=horoscope_signs,
         prenoms_du_jour=prenoms_du_jour,
-        communes_du_jour=communes_du_jour,
         marroniers_du_jour=marroniers_du_jour,
         edition=edition,
         weather_label=weather_label or "MÉTÉO DU JOUR",
