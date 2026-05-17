@@ -3,13 +3,14 @@
 
 import os
 import sys
+import importlib.util
 from pathlib import Path
 from datetime import datetime
 
-# Ajouter le répertoire parent au path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from flash_info_astemo import _update_podcast_rss
+# Charger le module principal (nom avec tiret)
+spec = importlib.util.spec_from_file_location("flash_info_astemo", str(Path(__file__).parent.parent / "flash-info-astemo.py"))
+flash_info_astemo = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(flash_info_astemo)
 
 def main():
     date_str = os.environ.get('DATE', datetime.utcnow().strftime('%Y%m%d'))
@@ -24,7 +25,7 @@ def main():
         print(f'ERREUR: Fichier non trouvé: {file_path}')
         sys.exit(1)
     
-    _update_podcast_rss(
+    flash_info_astemo._update_podcast_rss(
         rss_path=Path('docs/podcast.xml'),
         channel_title='L\'actualité du Freinage',
         channel_desc='L\'actualité du Freinage — matin, midi et soir par Madelaine',
