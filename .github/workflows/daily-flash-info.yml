@@ -45,7 +45,8 @@ jobs:
           ARCHIVE_SECRET_KEY: ${{ secrets.ARCHIVE_SECRET_KEY }}
         run: |
           # Générer le flash info pour l'édition du matin uniquement
-          python flash-info-astemo.py --edition matin --output docs/audio/flash-info-matin.mp3
+          OUTPUT_FILE="docs/audio/flash-info-astemo-$(date +'%Y%m%d')-matin.mp3"
+          python flash-info-astemo.py --edition matin --output "$OUTPUT_FILE"
           
       - name: Commit and push audio files
         env:
