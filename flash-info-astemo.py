@@ -53,7 +53,7 @@ MAX_ITEMS      = 7     # 7 sujets → ~2m-2m30 audio
 DESC_MAX_CHARS = 400   # description tronquée pour donner assez de contexte
 HASHTAG_COUNT  = 5     # nombre de hashtags générés par article
 
-MISTRAL_API_KEY     = os.environ["MISTRAL_API_KEY_ASTEMO"]
+MISTRAL_API_KEY_ASTEMO     = os.environ["MISTRAL_API_KEY_ASTEMO"]
 TTS_MODEL           = "voxtral-mini-tts-2603"
 STT_MODEL           = "voxtral-mini-latest"
 TTS_VOICE_DEFAULT   = "fr_marie_neutral"
@@ -169,13 +169,8 @@ WEATHER_API         = "https://api.open-meteo.com/v1/forecast"
 WEATHER_API_ARCHIVE = "https://archive-api.open-meteo.com/v1/archive"
 WEATHER_FORECAST_DAYS = 16  # fenêtre maximale de l'API forecast
 
-from data.geography import (
-    LIEUX_GUADELOUPE as _LIEUX_GUADELOUPE,
-    LIEUX_MONDE as _LIEUX_MONDE,
-    SOURCE_NAMES as _SOURCE_NAMES,
-)
-from data.fetes_patronales import COMMUNES_FETES_PATRONALES as _COMMUNES_FETES_PATRONALES
 from data.marroniers import get_marroniers_du_jour as _get_marroniers_du_jour
+
 from data.tts_normalize import (
     PRONONCIATIONS_LOCALES as _PRONONCIATIONS_LOCALES,
     SIGLES_MOT as _SIGLES_MOT,
@@ -594,7 +589,7 @@ def call_mistral(
         MISTRAL_CHAT_URL,
         data=json.dumps(payload).encode(),
         headers={
-            "Authorization": f"Bearer {MISTRAL_API_KEY}",
+            "Authorization": f"Bearer {MISTRAL_API_KEY_ASTEMO_ASTEMO}",
             "Content-Type": "application/json",
         },
     )
@@ -1179,7 +1174,7 @@ def _tts_call(text: str, output_path: Path, voice_id: str = TTS_VOICE_DEFAULT) -
         "https://api.mistral.ai/v1/audio/speech",
         data=payload,
         headers={
-            "Authorization": f"Bearer {MISTRAL_API_KEY}",
+            "Authorization": f"Bearer {MISTRAL_API_KEY_ASTEMO}",
             "Content-Type": "application/json",
         },
     )
@@ -1335,7 +1330,7 @@ def _mistral_stt(audio_path: Path, word_timestamps: bool = False) -> dict:
         "https://api.mistral.ai/v1/audio/transcriptions",
         data=body,
         headers={
-            "Authorization": f"Bearer {MISTRAL_API_KEY}",
+            "Authorization": f"Bearer {MISTRAL_API_KEY_ASTEMO}",
             "Content-Type": f"multipart/form-data; boundary={boundary}",
         },
     )
