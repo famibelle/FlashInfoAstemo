@@ -1165,6 +1165,7 @@ def _update_podcast_rss(
     duration_s: float,
     guid: str,
     pub_date: datetime,
+    keywords: str = "",
 ) -> None:
     """Insère un épisode en tête du flux RSS podcast (iTunes-compatible)."""
     import re as _re_rss
@@ -1181,8 +1182,11 @@ def _update_podcast_rss(
         f"      <enclosure url=\"{audio_url}\" length=\"{audio_size}\" type=\"audio/mpeg\"/>\n"
         f"      <guid isPermaLink=\"false\">{guid}</guid>\n"
         f"      <itunes:duration>{mins:02d}:{secs:02d}</itunes:duration>\n"
-        f"    </item>"
+        f"      <itunes:explicit>no</itunes:explicit>\n"
     )
+    if keywords:
+        new_item += f"      <itunes:keywords>{keywords}</itunes:keywords>\n"
+    new_item += f"    </item>"
     artwork = "https://famibelle.github.io/FlashInfoFreinage/artwork.jpg"
     items_block = "\n\n".join([new_item] + existing[:199])
     rss_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1632,13 +1636,16 @@ def main():
     except Exception as _e:
         print(f"⚠️  Archive texte échouée (non bloquant) : {_e}")
 
-    # Sauvegarder les métadonnées dans un JSON (titre, teaser, texte)
+    # Sauvegarder les métadonnées dans un JSON (titre, teaser, texte, hashtags)
     if items and args.output:
         json_output_path = args.output.with_suffix('.json')
+        # Extraire tous les hashtags des articles
+        all_hashtags = [tag for item in items for tag in item.get("hashtags", [])]
         metadata = {
             "titre": catchy_title,
             "teaser": teaser,
-            "texte": "\n\n---\n\n".join(segments)
+            "texte": "\n\n---\n\n".join(segments),
+            "hashtags": all_hashtags
         }
         json_output_path.write_text(
             json.dumps(metadata, ensure_ascii=False, indent=2),
@@ -1694,6 +1701,12 @@ def main():
     # Utiliser l'URL GitHub Pages pour le fichier audio
     podcast_audio_url = f"https://famibelle.github.io/FlashInfoAstemo/audio/{output_path.name}"
     if podcast_audio_url:
+        # Extraire les mots-clés (sans #) à partir des hashtags des articles
+        if items:
+            all_hashtags = [tag.lstrip('#') for item in items for tag in item.get("hashtags", [])]
+            keywords = ", ".join(all_hashtags) if all_hashtags else ""
+        else:
+            keywords = ""
         _update_podcast_rss(
             rss_path=PODCAST_RSS_PATH,
             channel_title="L'actualité du Freinage",
@@ -1705,6 +1718,7 @@ def main():
             duration_s=0,
             guid=output_path.stem,
             pub_date=datetime.utcnow(),
+            keywords=keywords,
         )
         print(f"   📻 podcast.xml mis à jour → {podcast_audio_url}")
     else:
