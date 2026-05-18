@@ -38,10 +38,20 @@ jobs:
 
       - name: Sync and Verify Git state
         run: |
+          # Vérifier qu'il n'y a pas de modifications non commitées
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "❌ ERREUR: Répertoire Git non propre (fichiers non commités)"
+            echo "   Fichiers modifiés :"
+            git status --porcelain
+            exit 1
+          fi
+          # Synchroniser avec origin/main
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git fetch origin >/dev/null 2>&1
-          git rebase origin/main || exit 1
+          if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
+            git rebase origin/main || exit 1
+          fi
           echo "✅ Branche synchronisée avec origin/main"
 
       - name: Set up Python
