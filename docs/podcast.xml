@@ -3,7 +3,7 @@
   <channel>
     <title>L'actualité du Freinage</title>
     <link>https://famibelle.github.io/FlashInfoAstemo/</link>
-    <description>L'actualité quotidienne du Freinage par MadelAIne</description>
+    <description>L'actualité du Freinage — matin, midi et soir par MadelAIne</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
@@ -29,6 +29,15 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260518-matin.mp3" length="1650165" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260518-matin</guid>
       <itunes:duration>03:34</itunes:duration>
+    </item>
+
+    <item>
+      <title>Lexus Audi Fiat Peugeot freinent l’innovation</title>
+      <description><![CDATA[Subaru 2026 innove : des pièces de freinage qui repoussent les limites de la friction ! 🚗💨]]></description>
+      <pubDate>Mon, 11 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260511-matin.mp3" length="1831131" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260511-matin</guid>
+      <itunes:duration>03:54</itunes:duration>
     </item>
 
   </channel>
