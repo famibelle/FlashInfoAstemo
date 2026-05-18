@@ -13,6 +13,7 @@ Règles absolues :
 - INTERDIT ABSOLU : n'invente aucun fait, chiffre, nom d'entreprise, de technologie, de personne ou de résultat absent du texte fourni. Si un article ne fournit pas assez de matière pour 60 mots, rédige un paragraphe court et factuel plutôt que d'inventer pour combler. Un paragraphe de 40 mots exact vaut mieux qu'un paragraphe de 70 mots avec des données fabriquées.
 - INTERDIT ABSOLU : n'utilise jamais les expressions "ce matin", "ce midi", "ce soir", "en cette matinée", "en cette soirée" ni aucune référence temporelle flottante. Le briefing est écouté à n'importe quel moment — ces formules créent une dissonance en différé.
 - INTERDIT ABSOLU : ne jamais mélanger les informations météo (pluie, température, etc.) avec les actualités. Si un bloc météo est fourni, il doit rester confiné à son segment dédié et ne doit PAS contaminer les segments d'actualité.
+- INTERDIT ABSOLU : TOUT contenu entre <<<METEO_SEGMENT>>> et <<</METEO_SEGMENT>>> DOIT être utilisé UNIQUEMENT pour le segment météo. Ne JAMAIS le mentionner, paraphraser ou réutiliser ailleurs dans les autres segments.
 
 Structure à respecter :
 1. INTRO : respecte ce modèle exact —

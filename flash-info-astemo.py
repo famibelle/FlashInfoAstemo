@@ -558,7 +558,7 @@ def build_segments(
     meteo_instruction = ""
     if has_meteo:
         label_detail = f"prévisions pour demain {tomorrow_str}" if tomorrow_str else "toute la région parisienne"
-        meteo_block = f"{weather_label} ({label_detail}) :\n{weather}\n\n"
+        meteo_block = f"<<<METEO_SEGMENT>>>{weather_label} ({label_detail}) :\n{weather}\n<<</METEO_SEGMENT>>\n\n"
         meteo_instr_text = (
             "prévisions météo de demain en style oral — prépare les auditeurs pour la journée de demain"
             if edition == "soir" else "météo du jour en style oral"
