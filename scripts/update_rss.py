@@ -47,9 +47,18 @@ def load_metadata(json_path: Path) -> dict:
     """Charge les métadonnées depuis le fichier JSON."""
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            # Extraire et nettoyer les keywords à partir des hashtags
+            hashtags = data.get('hashtags', [])
+            keywords = ", ".join(tag.lstrip('#') for tag in hashtags) if hashtags else ""
+            return {
+                "titre": data.get("titre", ""),
+                "teaser": data.get("teaser", ""),
+                "texte": data.get("texte", ""),
+                "keywords": keywords
+            }
     except Exception:
-        return {"titre": "", "teaser": "", "texte": ""}
+        return {"titre": "", "teaser": "", "texte": "", "keywords": ""}
 
 
 def generate_rss(episodes: list[dict]) -> str:
@@ -59,6 +68,7 @@ def generate_rss(episodes: list[dict]) -> str:
         mins, secs = divmod(int(ep['duration_s']), 60)
         duration_str = f"{mins:02d}:{secs:02d}"
         pub_date = ep['pub_date'].strftime('%a, %d %b %Y %H:%M:%S +0000')
+        keywords = ep.get('keywords', '')
         
         item = (
             f"    <item>\n"
@@ -68,8 +78,11 @@ def generate_rss(episodes: list[dict]) -> str:
             f"      <enclosure url=\"{ep['audio_url']}\" length=\"{ep['audio_size']}\" type=\"audio/mpeg\"/>\n"
             f"      <guid isPermaLink=\"false\">{ep['guid']}</guid>\n"
             f"      <itunes:duration>{duration_str}</itunes:duration>\n"
-            f"    </item>"
+            f"      <itunes:explicit>no</itunes:explicit>\n"
         )
+        if keywords:
+            item += f"      <itunes:keywords>{keywords}</itunes:keywords>\n"
+        item += f"    </item>"
         items_xml.append(item)
     
     items_block = "\n\n".join(items_xml)
