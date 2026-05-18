@@ -1,42 +1,38 @@
-FLASH INFO KARUKERA — MATIN — mardi 12 mai 2026 21:25
+FLASH INFO KARUKERA — MATIN — mardi 12 mai 2026 19:22
 Articles : 7
 ============================================================
 
-Bonjour à toutes et à tous, nous sommes le mardi 12 mai 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : les pièces de frein du Subaru Uncharted 2026, une innovation en simulation pour le sport automobile, et les tendances du marché aftermarket.
+Bonjour à toutes et à tous, nous sommes le mardi 12 mai 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : un sommet dédié aux prototypes intelligents, des plaquettes haute performance pour le Ford Ranger Raptor, des salons techniques en approche, et des alertes sur la fraude dans les garages.
 C'est parti.
 
 ————————————————————————————————————————
 
-Côté marché après-vente, la demande reste stable pour les pièces d'usure, malgré une légère hausse des coûts des matières premières. Les garages indépendants misent sur la formation pour fidéliser leur clientèle, tandis que les équipementiers accélèrent leurs livraisons pour éviter les ruptures de stock.
+Côté simulation numérique, VI-grade finalise son programme pour le Smart Prototypes Summit qui se tiendra du 19 au 22 mai. Quarante présentations et vingt-six démonstrations en direct sont au menu, avec des interventions sur l'optimisation des systèmes de freinage virtuels et l'intégration des modèles thermomécaniques.
 
 ————————————————————————————————————————
 
-Du côté des constructeurs, Subaru dévoile les spécificités de son système de freinage pour le modèle Uncharted 2026. Conçu pour allier polyvalence et résistance aux conditions extrêmes, ce véhicule utilise des plaquettes en matériaux NAO pour une meilleure modulation d'effort et une usure maîtrisée, même en utilisation intensive.
+Freinage haute performance appliqué ici au Ford Ranger Raptor. Les modèles 2024 à 2026 exigent des composants capables de résister aux contraintes du tout-terrain et aux accélérations soutenues. Les équipementiers aftermarket planchent sur des plaquettes et disques renforcés pour maintenir la stabilité du freinage en conditions extrêmes.
 
 ————————————————————————————————————————
 
-Sur le segment compétition, une nouvelle génération de simulateurs driver-in-the-loop fait son apparition. Plus compacts et abordables, ces outils permettent désormais aux équipes de sport automobile de tester virtuellement leurs systèmes de freinage dans des conditions proches du réel, sans investir dans des infrastructures coûteuses.
+On passe à l'entretien des systèmes de freinage. Kalimex, via son expert Colin Benzie, insiste sur l'importance d'un nettoyage approfondi des étriers et des pistons. Les résidus de poussière de frein et les dépôts corrosifs altèrent la modulation d'effort et accélèrent l'usure des garnitures.
 
 ————————————————————————————————————————
 
-Côté innovation technologique, VI-grade finalise le programme de son Smart Prototypes Summit. Parmi les démonstrations prévues, plusieurs porteront sur l'optimisation des systèmes de freinage pour les prototypes autonomes et électriques, avec des retours concrets sur la gestion du fade thermique et la récupération d'énergie.
+Côté salons techniques, les inscriptions sont ouvertes pour TechFest North, qui se déroulera à Newcastle. L'événement gratuit mettra en avant les dernières innovations en matière de diagnostic et de maintenance des systèmes de freinage, avec des ateliers pratiques dédiés aux professionnels.
 
 ————————————————————————————————————————
 
-On passe à la formation : les garagistes indépendants placent la gestion de trésorerie au cœur de leurs priorités. Une meilleure anticipation des flux financiers permet d'investir dans des outils de diagnostic plus performants, essentiels pour intervenir sur des systèmes de freinage de plus en plus complexes.
+Du côté des garages indépendants, Point S alerte sur la recrudescence des fraudes aux rétrofacturations. Les ateliers doivent redoubler de vigilance face aux clients malhonnêtes qui contestent des interventions déjà réalisées, notamment sur les remplacements de plaquettes ou de disques.
 
 ————————————————————————————————————————
 
-Côté relation client, le Motor Ombudsman lance la septième édition de ses Star Awards. Ces récompenses mettent en lumière les professionnels du secteur qui excellent dans le service après-vente, notamment pour les interventions sur les systèmes de freinage, où la transparence et la pédagogie font la différence.
+Think Car UK sera présent au UK Garage & Bodyshop Event 2026 pour accompagner les ateliers dans leurs défis quotidiens. L'accent sera mis sur les solutions de freinage adaptées aux véhicules hybrides et électriques, avec des démonstrations sur la gestion des systèmes régénératifs.
 
 ————————————————————————————————————————
 
-Du côté des équipementiers, Nissens Automotive renforce sa présence sur le marché aftermarket. Si l'actualité porte sur les bobines d'allumage, l'entreprise confirme aussi son engagement à étendre sa gamme de composants de freinage, avec des références adaptées aux véhicules récents et aux motorisations hybrides.
+Autotech Group profitera aussi du UK Garage & Bodyshop Event pour présenter ses technologies dédiées à la sécurité des ateliers. Au programme : des formations sur les bonnes pratiques de manipulation des étriers et des outils connectés pour le contrôle des pressions de freinage.
 
 ————————————————————————————————————————
 
-Enfin, un mot sur les bonnes pratiques : construire une marque personnelle solide passe par la disponibilité et l'expertise. Pour les professionnels du freinage, cela signifie savoir expliquer simplement les enjeux techniques, comme la différence entre un étrier flottant et un étrier fixe, ou l'impact des émissions de particules fines sur le choix des garnitures.
-
-————————————————————————————————————————
-
-Voilà pour ce L'actualité du Freinage du mardi 12 mai 2026. Sources : Autotechnician Magazine et Dynamic Friction Company (DFC) et Vehicle Dynamics International (général). On se retrouve à demain pour une nouvelle édition. Bonne journée à toutes et à tous.
+Voilà pour ce L'actualité du Freinage du mardi 12 mai 2026. Sources : Vehicle Dynamics International et Dynamic Friction Company et Autotechnician Magazine. On se retrouve à demain pour une nouvelle édition. Bonne journée à toutes et à tous.
