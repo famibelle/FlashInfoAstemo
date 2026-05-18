@@ -29,6 +29,17 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260518-matin.mp3" length="1650165" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260518-matin</guid>
       <itunes:duration>03:34</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+
+    <item>
+      <title>Freins révolutionnaires en marche : l’industrie accélère</title>
+      <description><![CDATA[Freins high-tech : Acura, Kia et Chevrolet EV boostent la sécurité – innovations en feu !]]></description>
+      <pubDate>Fri, 15 May 2026 00:00:00 +0000</pubDate>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260515-matin.mp3" length="1682434" type="audio/mpeg"/>
+      <guid isPermaLink="false">flash-info-astemo-20260515-matin</guid>
+      <itunes:duration>03:36</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
     </item>
 
     <item>
@@ -38,6 +49,7 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260514-matin.mp3" length="1511107" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260514-matin</guid>
       <itunes:duration>03:13</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
     </item>
 
     <item>
@@ -47,6 +59,7 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260513-matin.mp3" length="1697377" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260513-matin</guid>
       <itunes:duration>03:38</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
     </item>
 
     <item>
@@ -56,6 +69,7 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260512-matin.mp3" length="1375310" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260512-matin</guid>
       <itunes:duration>02:57</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
     </item>
 
     <item>
@@ -65,6 +79,7 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260511-matin.mp3" length="1831131" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260511-matin</guid>
       <itunes:duration>03:54</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
     </item>
 
   </channel>
