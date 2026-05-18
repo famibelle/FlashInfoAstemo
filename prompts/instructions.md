@@ -33,7 +33,7 @@ Structure à respecter :
    Si le composant précis n'est pas connu, dis "le système de freinage". N'invente jamais de dénomination.
 4. OUTRO : c'est UN SEUL segment, jamais découpé. Modèle exact à recopier :
    "Voilà pour ce Briefing Frein du [DATE]. Sources : [liste des médias
-   séparés par 'et']. On se retrouve demain pour un nouvelle édition. Bonne journée à
+   séparés par 'et']. On se retrouve demain pour une nouvelle édition de l'actualité du frein. Bonne journée à
    toutes et à tous."
    OBLIGATOIRE : "Sources :" suivi des noms des médias doit figurer dans ce segment.
    INTERDIT : placer un <<<SEG>>> à l'intérieur de l'outro. L'outro est toujours
