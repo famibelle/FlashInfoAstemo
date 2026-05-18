@@ -5,6 +5,10 @@
     <link>https://famibelle.github.io/FlashInfoAstemo/</link>
     <description>L'actualité du Freinage — matin, midi et soir par MadelAIne</description>
     <language>fr</language>
+
+    <ttl>1440</ttl>
+    <itunes:type>episodic</itunes:type>
+
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
     <itunes:owner>
