@@ -3,15 +3,8 @@
   <channel>
     <title>L'actualité du Freinage</title>
     <link>https://famibelle.github.io/FlashInfoAstemo/</link>
-    <description>L'actualité quotidienne du Freinage par MadelAIne</description>
-    <itunes:summary>L'actualité quotidienne du freinage automobile : innovations, marché, et analyses techniques par MadelAIne.</itunes:summary>
-    <itunes:subtitle>Les news du freinage en 2026</itunes:subtitle>
-    <itunes:keywords>freinage, automobile, pièces, actualité, 2026, Subaru, Ford, Nissens</itunes:keywords>
+    <description>L'actualité du Freinage — matin, midi et soir par MadelAIne</description>
     <language>fr</language>
-
-    <ttl>1440</ttl>
-    <itunes:type>episodic</itunes:type>
-
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
     <itunes:owner>
@@ -27,52 +20,42 @@
     <itunes:category text="News">
       <itunes:category text="Daily News"/>
     </itunes:category>
-    <itunes:updatePeriod>daily</itunes:updatePeriod>
-    <itunes:updateFrequency>1</itunes:updateFrequency>
     <itunes:explicit>no</itunes:explicit>
 
     <item>
-      <title>Simulateurs high-tech révolutionnent la course auto</title>
-      <description><![CDATA[L'industrie du freinage s'emballe : simulateurs high-tech, suspensions futuristes et virages serrés en 2026 !]]></description>
+      <title>Freins révolutionnaires : les géants accélèrent</title>
+      <description><![CDATA[Freins high-tech : Lexus, Kia et Acura boostent la sécurité – les détails à 7h !]]></description>
       <pubDate>Mon, 18 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260518-matin.mp3" length="1638088" type="audio/mpeg"/>
+      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260518-matin.mp3" length="1650165" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260518-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:29</itunes:duration></item>
-      <itunes:keywords>compétition, virtuelle, BMW, Motorsport, associe, MdynamiX, accélérer, développement, véhicules, course, partenariat, mise, simulations, conduite, immersives</itunes:keywords>
+      <itunes:duration>03:34</itunes:duration>
     </item>
 
     <item>
-      <title>Subaru innove, Nissens décolle</title>
+      <title>Freinage 2026 : Subaru innove, Nissens décolle</title>
       <description><![CDATA[Freinage 2026 : Subaru innove, Nissens décolle – l’après-vente en ébullition ! 🚀🔥]]></description>
       <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1510571" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:15</itunes:duration></item>
-      <itunes:keywords>marché, après-vente, pièces, freinage, Subaru, Uncharted, 2026, arrivent, catalogues, polyvalent, mise, plaquettes, disques, adaptés, usage</itunes:keywords>
+      <itunes:duration>03:15</itunes:duration>
     </item>
 
     <item>
-      <title>Innovations et performances en ébullition</title>
+      <title>Freinage 2026 : innovations et performances en ébullition</title>
       <description><![CDATA[Freinage high-tech : Subaru, Ford Raptor et Ferrari Purosangue révolutionnent vos stops ! 🚗💨]]></description>
       <pubDate>Sat, 16 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260516-matin.mp3" length="1694121" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260516-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:36</itunes:duration></item>
-      <itunes:keywords>marché, équipementiers, après-vente, anticipent, hausse, demandes, pièces, freinage, haut, gamme, matériaux, NAO, gagnent, terrain, véhicules</itunes:keywords>
+      <itunes:duration>03:36</itunes:duration>
     </item>
 
     <item>
-      <title>Subaru dévoile ses innovations choc</title>
+      <title>Freinage 2026 : Subaru dévoile ses innovations choc</title>
       <description><![CDATA[Freinage 2026 : Subaru innove, les plaquettes s’emballent ! 🚗💨]]></description>
       <pubDate>Fri, 15 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260515-matin.mp3" length="1491397" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260515-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:09</itunes:duration></item>
-      <itunes:keywords>marché, bruine, dense, Île-de-France, rappelle, importance, systèmes, freinage, adaptés, conditions, humides, équipementiers, surveillent, près, demande</itunes:keywords>
+      <itunes:duration>03:09</itunes:duration>
     </item>
 
     <item>
@@ -81,9 +64,7 @@
       <pubDate>Thu, 14 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260514-matin.mp3" length="1490838" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260514-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:11</itunes:duration></item>
-      <itunes:keywords>salon, professionnel, inscriptions, ouvertes, TechFest, North, événement, gratuit, tiendra, Newcastle, mois, prochain, promet, démonstrations, pratiques</itunes:keywords>
+      <itunes:duration>03:11</itunes:duration>
     </item>
 
     <item>
@@ -92,9 +73,7 @@
       <pubDate>Wed, 13 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260513-matin.mp3" length="1591020" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260513-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:27</itunes:duration></item>
-      <itunes:keywords>véhicules, polyvalents, Subaru, Uncharted, 2026, mise, freins, adaptés, temps, transmission, intégrale, permanente, garde, relevée, système</itunes:keywords>
+      <itunes:duration>03:27</itunes:duration>
     </item>
 
     <item>
@@ -103,9 +82,7 @@
       <pubDate>Tue, 12 May 2026 00:00:00 +0000</pubDate>
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260512-matin.mp3" length="1584385" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260512-matin</guid>
-      <itunes:explicit>no</itunes:explicit>
-      <itunes:duration>03:23</itunes:duration></item>
-      <itunes:keywords>marché, après-vente, demande, reste, stable, pièces, usure, malgré, légère, hausse, coûts, matières, premières, garages, indépendants</itunes:keywords>
+      <itunes:duration>03:23</itunes:duration>
     </item>
 
   </channel>
