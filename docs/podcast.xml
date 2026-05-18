@@ -24,6 +24,8 @@
     <itunes:category text="News">
       <itunes:category text="Daily News"/>
     </itunes:category>
+    <itunes:updatePeriod>daily</itunes:updatePeriod>
+    <itunes:updateFrequency>1</itunes:updateFrequency>
     <itunes:explicit>no</itunes:explicit>
 
     <item>
