@@ -35,7 +35,16 @@ PRONONCIATIONS_LOCALES = {
 }
 
 # Sigles prononcés comme des mots (ne pas épeler lettre par lettre)
-SIGLES_MOT = {"RCI", "UNESCO", "UNICEF", "NASA", "SUV", "BMW", "ABS"}
+SIGLES_MOT = {
+    # Génériques
+    "RCI", "UNESCO", "UNICEF", "NASA", "SUV",
+    # Constructeurs
+    "BMW", "ABS", "FORD", "VW", "AUDI", "GM", "TOYOTA",
+    # Technologies freinage/sécurité
+    "ESP", "EBD", "ASR", "BA", "TCS", "VDC", "ESC", "EBA", "HBA", "ACC", "ADAS",
+    # Systèmes
+    "ECU", "CAN", "OBD", "NAO"
+}
 
 # Abréviations et symboles à développer pour le TTS
 ABBREVS = {
