@@ -533,7 +533,7 @@ def build_segments(
         n_segs = len(items) + base_segs
         news_block = f"Voici les {len(items)} actualités du jour :\n\n{articles}\n\n"
         outro_template = (
-            f"Voilà pour ce L'actualité du Freinage du {date_str}. "
+            f"Voilà pour cette actualité du Freinage du {date_str}. "
             f"Sources : {sources_str}. "
             f"On se retrouve {rdv}. "
             f"{salut} à toutes et à tous."
