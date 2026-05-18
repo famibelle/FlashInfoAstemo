@@ -3,7 +3,7 @@
   <channel>
     <title>L'actualité du Freinage</title>
     <link>https://famibelle.github.io/FlashInfoAstemo/</link>
-    <description>L'actualité du Freinage — matin, midi et soir par MadelAIne</description>
+    <description>L'actualité quotidienne du Freinage par MadelAIne</description>
     <language>fr</language>
     <copyright>© Botiran</copyright>
     <itunes:author>Botiran</itunes:author>
@@ -29,60 +29,6 @@
       <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260518-matin.mp3" length="1650165" type="audio/mpeg"/>
       <guid isPermaLink="false">flash-info-astemo-20260518-matin</guid>
       <itunes:duration>03:34</itunes:duration>
-    </item>
-
-    <item>
-      <title>Freinage 2026 : Subaru innove, Nissens décolle</title>
-      <description><![CDATA[Freinage 2026 : Subaru innove, Nissens décolle – l’après-vente en ébullition ! 🚀🔥]]></description>
-      <pubDate>Sun, 17 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260517-matin.mp3" length="1510571" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260517-matin</guid>
-      <itunes:duration>03:15</itunes:duration>
-    </item>
-
-    <item>
-      <title>Freinage 2026 : innovations et performances en ébullition</title>
-      <description><![CDATA[Freinage high-tech : Subaru, Ford Raptor et Ferrari Purosangue révolutionnent vos stops ! 🚗💨]]></description>
-      <pubDate>Sat, 16 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260516-matin.mp3" length="1694121" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260516-matin</guid>
-      <itunes:duration>03:36</itunes:duration>
-    </item>
-
-    <item>
-      <title>Freinage 2026 : Subaru dévoile ses innovations choc</title>
-      <description><![CDATA[Freinage 2026 : Subaru innove, les plaquettes s’emballent ! 🚗💨]]></description>
-      <pubDate>Fri, 15 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260515-matin.mp3" length="1491397" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260515-matin</guid>
-      <itunes:duration>03:09</itunes:duration>
-    </item>
-
-    <item>
-      <title>Épuration freins : l’heure est grave</title>
-      <description><![CDATA[Nettoyage pro, fraudes, tech sécurité : les freins du futur s’inventent MAINTENANT ! 🚗💨]]></description>
-      <pubDate>Thu, 14 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260514-matin.mp3" length="1490838" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260514-matin</guid>
-      <itunes:duration>03:11</itunes:duration>
-    </item>
-
-    <item>
-      <title>Subaru Ford Infiniti : la révolution frein en marche</title>
-      <description><![CDATA[Subaru, Ford, Maserati... Ces freins vont tout changer en 2026 ! 🚗💨]]></description>
-      <pubDate>Wed, 13 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260513-matin.mp3" length="1591020" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260513-matin</guid>
-      <itunes:duration>03:27</itunes:duration>
-    </item>
-
-    <item>
-      <title>Subaru 2026 : L’innovation qui freine les limites</title>
-      <description><![CDATA[Subaru 2026 : des pièces de freinage qui repoussent les limites, prêts à tester ?]]></description>
-      <pubDate>Tue, 12 May 2026 00:00:00 +0000</pubDate>
-      <enclosure url="https://famibelle.github.io/FlashInfoAstemo/audio/flash-info-astemo-20260512-matin.mp3" length="1584385" type="audio/mpeg"/>
-      <guid isPermaLink="false">flash-info-astemo-20260512-matin</guid>
-      <itunes:duration>03:23</itunes:duration>
     </item>
 
   </channel>
