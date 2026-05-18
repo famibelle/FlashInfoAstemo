@@ -35,7 +35,7 @@ PRONONCIATIONS_LOCALES = {
 }
 
 # Sigles prononcés comme des mots (ne pas épeler lettre par lettre)
-SIGLES_MOT = {"RCI", "UNESCO", "UNICEF", "NASA", "SUV", "BMW"}
+SIGLES_MOT = {"RCI", "UNESCO", "UNICEF", "NASA", "SUV", "BMW", "ABS"}
 
 # Abréviations et symboles à développer pour le TTS
 ABBREVS = {
