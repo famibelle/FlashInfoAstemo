@@ -1,0 +1,38 @@
+FLASH INFO KARUKERA — MATIN — jeudi 28 mai 2026 04:33
+Articles : 7
+============================================================
+
+Bonjour à toutes et à tous, nous sommes le jeudi 28 mai 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : des systèmes de freinage sans fluide qui entrent en production, des capteurs qui analysent l'état de la route en temps réel, et des avancées majeures sur les matériaux et la simulation.
+C'est parti.
+
+————————————————————————————————————————
+
+Côté thermique embarqué, Valeo alerte sur un effet secondaire des architectures modernes. Les véhicules actuels partagent des boucles thermiques communes entre moteur, batterie et systèmes électroniques. Résultat : quand la température grimpe, le logiciel réduit discrètement la puissance du compresseur pour préserver la batterie. Conséquence directe sur le freinage : les étriers et disques surchauffent sans que le conducteur en ait conscience, augmentant le risque de fade thermique.
+
+————————————————————————————————————————
+
+Matériaux légers, appliqués ici à la caisse automobile. Une étude de WorldAutoSteel montre que les aciers haute résistance avancés permettent de réduire de trente-quatre pour cent le nombre de pièces d'un véhicule. Moins de masse, c'est moins d'inertie à freiner — donc des systèmes de freinage plus compacts et plus efficaces. L'étude valide aussi des économies de coûts de fabrication, un argument clé pour les constructeurs.
+
+————————————————————————————————————————
+
+Plaisir de conduite, qu'on cherche à quantifier scientifiquement. Polestar s'associe au laboratoire d'impact de l'Université d'Oxford pour mesurer les réactions physiologiques des conducteurs. L'objectif : identifier les paramètres de freinage — modulation d'effort, progressivité, retour haptique — qui déclenchent une sensation d'excitation. Une approche inédite pour concevoir des systèmes plus engageants sans sacrifier la sécurité.
+
+————————————————————————————————————————
+
+Simulation numérique, avec un nouveau terrain de jeu virtuel. rFpro lance un jumeau numérique ultra-précis du circuit de Hakone au Japon, quinze kilomètres de route sinueuse utilisée pour le développement des véhicules. Les constructeurs pourront y tester les algorithmes de freinage régénératif et les stratégies de répartition de couple entre roues, dans des conditions réalistes sans quitter le bureau.
+
+————————————————————————————————————————
+
+Durabilité des systèmes, optimisée par une nouvelle plateforme de données. HBK présente Fusion RX, un outil qui capture les charges réelles subies par les freins lors des essais routiers. Les données sont ensuite injectées directement dans les logiciels de simulation pour affiner la résistance des étriers, des disques et des garnitures. Un gain de temps et de précision pour les équipes d'ingénierie.
+
+————————————————————————————————————————
+
+Perception avancée, où le LiDAR rencontre l'acoustique. AEye et MoveAWheeL collaborent pour fusionner la détection longue portée du LiDAR avec la mesure de l'adhérence par capteurs acoustiques. L'idée : anticiper les variations de friction avant que les roues ne les rencontrent. Une avancée majeure pour les systèmes de freinage autonome, qui pourraient adapter la pression des étriers en fonction de l'état du bitume.
+
+————————————————————————————————————————
+
+Freinage by-wire, avec une première mondiale en production. Brembo annonce que son système Sensify, entièrement électrique et sans fluide, équipe désormais un constructeur global. Plus de maître-cylindre, plus de canalisations hydrauliques : la pression est générée par des actionneurs électromécaniques pilotés par logiciel. Une révolution pour la modularité, la maintenance et l'intégration avec les fonctions autonomes.
+
+————————————————————————————————————————
+
+Voilà pour cette actualité du Freinage du jeudi 28 mai 2026. Sources : Autotechnician Magazine et Vehicle Dynamics International. On se retrouve demain pour une nouvelle édition. Bonne journée à toutes et à tous.
