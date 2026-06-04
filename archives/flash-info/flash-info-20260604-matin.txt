@@ -1,0 +1,38 @@
+FLASH INFO KARUKERA — MATIN — jeudi 4 juin 2026 04:36
+Articles : 7
+============================================================
+
+Bonjour à toutes et à tous, nous sommes le jeudi 4 juin 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : des avancées en aciers haute résistance pour alléger les véhicules, une collaboration innovante entre LiDAR et capteurs de route, et Brembo qui lance son système de freinage sans fluide en production série.
+C'est parti.
+
+————————————————————————————————————————
+
+Côté thermique embarqué, Valeo alerte sur un effet secondaire des architectures modernes. Avec les boucles thermiques partagées, les compresseurs pilotés par logiciel et les échangeurs empilés, les véhicules surchauffent sans signe avant-coureur. Le risque ? Une dégradation accélérée des matériaux de friction, surtout en usage urbain intense. Les équipementiers planchent sur des algorithmes prédictifs pour anticiper ces pics de température avant qu'ils n'impactent le freinage.
+
+————————————————————————————————————————
+
+Matériaux innovants appliqués à la carrosserie — et indirectement au freinage. Une étude de WorldAutoSteel démontre que les aciers haute résistance avancés permettent de réduire de trente-quatre pour cent le nombre de pièces d'un véhicule. Moins de masse, c'est moins d'inertie à freiner, donc des systèmes plus compacts et une meilleure efficacité énergétique. Les premiers modèles équipés arrivent dès l'année prochaine.
+
+————————————————————————————————————————
+
+Sur le front de l'expérience conducteur, Polestar et l'Université d'Oxford tentent de quantifier scientifiquement le plaisir de conduire. Leur étude mesure les réponses physiologiques et cognitives liées à l'excitation au volant. Objectif : identifier les paramètres de freinage — modulation d'effort, réponse de l'A.B.S., progressivité — qui maximisent cette sensation. Une piste pour concevoir des systèmes plus engageants sans sacrifier la sécurité.
+
+————————————————————————————————————————
+
+Simulation numérique appliquée au développement dynamique. rFpro lance un jumeau numérique haute fidélité du circuit de Hakone, au Japon. Ce modèle permet de tester virtuellement les systèmes de freinage dans des conditions réelles — dénivelés, virages serrés, variations d'adhérence. Les constructeurs gagnent du temps et réduisent les coûts de prototypage, tout en affinant la calibration des aides électroniques comme l'E.S.P.
+
+————————————————————————————————————————
+
+Du côté des essais durabilité, HBK présente sa plateforme Fusion RX. Ce système unifie la collecte des données de charge routière et leur transfert vers les outils de simulation. Pour les ingénieurs freinage, c'est un gain précieux : mieux corréler les contraintes réelles subies par les étriers et les disques avec les modèles virtuels. Moins de tests physiques, des garnitures optimisées plus rapidement.
+
+————————————————————————————————————————
+
+Perception augmentée appliquée à la sécurité active. AEye et MoveAWheeL signent un accord pour fusionner le LiDAR longue portée et la détection acoustique de l'état de la route. L'idée ? Anticiper les variations de friction avant même que les roues ne les rencontrent. Un atout pour les systèmes de freinage autonome, qui pourraient ajuster la pression des étriers en amont, surtout sur sol mouillé ou verglacé.
+
+————————————————————————————————————————
+
+Freinage by-wire appliqué à la production série. Brembo annonce le lancement en série de son système Sensify, entièrement sans fluide. Piloté par logiciel, il élimine les risques de fuite et permet une intégration plus fine avec les autres systèmes du véhicule, notamment le freinage régénératif. Un pas de plus vers des architectures 100 % électriques, avec une réactivité et une modularité inédites.
+
+————————————————————————————————————————
+
+Voilà pour cette actualité du Freinage du jeudi 4 juin 2026. Sources : Autotechnician Magazine et Vehicle Dynamics International. On se retrouve demain pour une nouvelle édition. Bonne journée à toutes et à tous.
