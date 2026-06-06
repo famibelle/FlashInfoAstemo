@@ -1,0 +1,38 @@
+FLASH INFO KARUKERA — MATIN — samedi 6 juin 2026 04:28
+Articles : 7
+============================================================
+
+Bonjour à toutes et à tous, nous sommes le samedi 6 juin 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : surveillance continue des freins pour les flottes, simulation au service des prototypes intelligents, Ford qui accélère ses tests virtuels, et une hypercar Pagani qui roule avec des pneus connectés.
+C'est parti.
+
+————————————————————————————————————————
+
+Côté flottes professionnelles, Teletrac Navman lance un système de surveillance électronique des performances de freinage. Plus besoin de tests réactifs : le système surveille en continu l'état des freins, protégeant les licences des conducteurs et l'utilisation des véhicules. Une avancée pour la sécurité et la maintenance préventive des poids lourds.
+
+————————————————————————————————————————
+
+Du côté des outils de développement, VI-grade et HBK célèbrent le succès du premier Smart Prototypes Summit. Plus de cent entreprises et mille cinq cents participants en ligne ont échangé sur les dernières innovations en simulation. Quarante sessions techniques pour faire avancer les prototypes intelligents.
+
+————————————————————————————————————————
+
+Pour ceux qui ont manqué l'événement, VI-grade propose un récapitulatif vidéo du Smart Prototypes Summit. On y retrouve les moments clés, les technologies présentées et les intervenants. Une façon de revivre ou de découvrir les avancées en simulation et développement de prototypes.
+
+————————————————————————————————————————
+
+Chez Ford, la simulation prend une place centrale. Louis Jamail, responsable des méthodes et de la simulation dynamique, explique comment l'adoption de ces technologies permet de multiplier par dix le nombre de tests, tout en divisant par dix le temps nécessaire. Un gain d'efficacité majeur pour le développement des véhicules.
+
+————————————————————————————————————————
+
+Sur le segment compétition, Cadillac Formula 1 mise sur un simulateur haut de gamme. Le DMG-360XY, un simulateur avec pilote dans la boucle, va soutenir le développement des monoplaces, la préparation des pilotes et la corrélation technique sous les nouvelles réglementations de la F1. Une étape clé pour rester compétitif.
+
+————————————————————————————————————————
+
+Randle Engineering, un cabinet britannique de conception et développement, renforce son équipe. Javier Maruenda rejoint le groupe en tant qu'ingénieur senior en dynamique véhicule. Une nomination qui s'inscrit dans la stratégie de croissance de l'entreprise, spécialisée dans l'optimisation des performances automobiles.
+
+————————————————————————————————————————
+
+Pneus connectés et freinage : une Pagani Utopia Roadster a parcouru mille cinq cents kilomètres pour démontrer le système Cyber Tyre. Le trajet, de Bologne à Stuttgart puis Milan, a permis de tester en conditions réelles cette technologie développée par Pirelli et Bosch Engineering. Une vitrine pour l'avenir des systèmes intelligents.
+
+————————————————————————————————————————
+
+Voilà pour cette actualité du Freinage du samedi 6 juin 2026. Sources : Vehicle Dynamics International (général). On se retrouve demain pour une nouvelle édition. Bonne journée à toutes et à tous.
