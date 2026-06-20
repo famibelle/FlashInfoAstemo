@@ -1,0 +1,38 @@
+FLASH INFO KARUKERA — MATIN — samedi 20 juin 2026 04:34
+Articles : 7
+============================================================
+
+Bonjour à toutes et à tous, nous sommes le samedi 20 juin 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : des pneus optimisés pour l'électrique, une innovation en vectorisation de couple, un simulateur de conduite compact, et des systèmes de freinage adaptés aux pick-ups électriques.
+C'est parti.
+
+————————————————————————————————————————
+
+Côté compétition, McMurtry Automotive dévoile les coulisses de la Spéirling Pure. Le constructeur britannique a conçu en interne une suspension sur mesure, associée à de nouveaux pneus slicks Michelin plus larges. Ces gommes, capables de performances extrêmes, visent à maximiser l'adhérence tout en optimisant la dissipation thermique — un enjeu clé pour les freinages répétés à haute vitesse.
+
+————————————————————————————————————————
+
+Pneus et efficacité énergétique, appliqués ici aux véhicules électriques. Continental et Renault Group présentent un nouveau pneu affichant une résistance au roulement inférieure de trente-cinq pour cent à la meilleure note A du label européen. Une avancée qui réduit la consommation d'énergie et, indirectement, préserve l'autonomie des batteries — tout en limitant la sollicitation des systèmes de freinage régénératif.
+
+————————————————————————————————————————
+
+Vectorisation de couple active, qu'on découvre grâce à Alpine. Pierre Gasly met en lumière la technologie Active Torque Vectoring, développée par la marque française. Ce système ajuste en temps réel la répartition du couple entre les roues arrière, améliorant la stabilité et la précision de conduite. Une innovation qui influence directement la dynamique de freinage, en optimisant la répartition des efforts lors des phases de décélération.
+
+————————————————————————————————————————
+
+Simulation de conduite, avec une solution compacte venue de la Formule 1. Dynisma lance le DMG-S, un simulateur Driver-in-the-Loop plus accessible. Cette technologie, dérivée des outils utilisés en F1, permet de tester virtuellement les systèmes de freinage et de dynamique véhicule avec une fidélité inédite. Un atout pour les équipes de développement, qui peuvent affiner la modulation d'effort et la réponse des étriers avant même les premiers essais physiques.
+
+————————————————————————————————————————
+
+Stratégie industrielle chez Volkswagen Group. Le constructeur vise une marge opérationnelle de huit à dix pour cent d'ici 2030, avec un plan en huit points incluant la consolidation des plateformes et la réduction des coûts. Pour les systèmes de freinage, cette rationalisation pourrait accélérer l'adoption de solutions standardisées, notamment pour les freins de stationnement électriques et les architectures hybrides thermique-électrique.
+
+————————————————————————————————————————
+
+Freinage électrique, appliqué au Chevrolet Silverado EV. Le pick-up électrique 2024-2026 combine la robustesse d'un véhicule utilitaire avec les exigences d'un modèle à batterie. Ses plaquettes et disques doivent résister à des charges élevées tout en intégrant des matériaux NAO pour limiter les émissions de particules fines. Un équilibre technique entre durabilité et performance, crucial pour les usages intensifs.
+
+————————————————————————————————————————
+
+Sécurité des flottes, avec un système de surveillance continue. Teletrac Navman intègre un module de monitoring électronique des performances de freinage. Ce système élimine les tests réactifs en analysant en temps réel l'efficacité des garnitures et la réponse des étriers. Une solution qui protège les licences des conducteurs et optimise l'utilisation des véhicules, tout en réduisant les risques de fade thermique ou de défaillance mécanique.
+
+————————————————————————————————————————
+
+Voilà pour cette actualité du Freinage du samedi 20 juin 2026. Sources : Vehicle Dynamics International et Dynamic Friction Company. On se retrouve demain pour une nouvelle édition. Bonne journée à toutes et à tous.
