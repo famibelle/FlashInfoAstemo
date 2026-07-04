@@ -1,0 +1,38 @@
+FLASH INFO KARUKERA — MATIN — samedi 4 juillet 2026 04:19
+Articles : 7
+============================================================
+
+Bonjour à toutes et à tous, nous sommes le samedi 4 juillet 2026 et vous écoutez l'actualité du Frein, votre tour d'horizon de l'industrie du freinage et de la mobilité. Au programme : Tesla Semi face au dérapage, NIO ouvre un centre R&D en Angleterre, Continental et Renault repoussent les limites des pneus, et des innovations en freinage minier.
+C'est parti.
+
+————————————————————————————————————————
+
+Côté dynamique véhicule, Tesla vient de montrer comment son Semi réagit en situation de dérapage sur glace. Une vidéo tournée en Alaska révèle le travail des systèmes de contrôle de stabilité et de freinage régénératif pour éviter le tête-à-queue. Le camion électrique utilise une modulation d'effort en temps réel pour redistribuer le couple et garder la trajectoire. Une démonstration rare de la robustesse des algorithmes embarqués.
+
+————————————————————————————————————————
+
+Du côté des constructeurs électriques, NIO inaugure un centre R&D de près de 9 500 mètres carrés dans l'Oxfordshire. Ce site se concentrera sur le développement des châssis intelligents, avec une attention particulière portée aux systèmes de freinage, à la simulation et à l'acoustique. Une étape clé pour accélérer l'intégration des technologies de sécurité active sur les futurs modèles.
+
+————————————————————————————————————————
+
+Sur le salon Vehicle Tech Week Europe à Stuttgart, l'industrie a montré sa résilience malgré un contexte difficile. OEM et équipementiers ont échangé sur les solutions de freinage du futur, notamment les systèmes hybrides combinant récupération d'énergie et freinage mécanique. L'événement a aussi mis en lumière les défis de la simulation numérique pour valider les performances en conditions extrêmes.
+
+————————————————————————————————————————
+
+Chez McMurtry, on découvre les coulisses du Spéirling Pure, avec une suspension et des pneus Michelin slicks conçus en interne. Le réglage des étriers et la répartition du freinage jouent un rôle crucial pour exploiter la puissance de ce prototype électrique. Les ingénieurs ont optimisé la modulation d'effort pour éviter le fade thermique lors des accélérations fulgurantes.
+
+————————————————————————————————————————
+
+Pneus et freinage font bon ménage chez Continental et Renault Group. Leur nouvelle gomme pour véhicules électriques affiche une résistance au roulement inférieure de trente-cinq pour cent à la meilleure note européenne. Moins d'effort pour avancer, c'est aussi moins de sollicitation pour le système de freinage, et une autonomie préservée.
+
+————————————————————————————————————————
+
+On passe aux pièces de rechange avec le Chevrolet Silverado EV. Ce pick-up électrique mise sur des plaquettes et disques dimensionnés pour absorber l'énergie cinétique d'un véhicule de plus de trois tonnes. Les matériaux semi-métalliques garantissent une durée de vie prolongée, même sous des charges élevées. Un exemple de l'adaptation des composants aux nouvelles motorisations.
+
+————————————————————————————————————————
+
+Freinage industriel, appliqué ici aux véhicules légers miniers. ABT équipe la flotte de BHP Olympic Dam avec son système SIBS, un frein de stationnement électrique intégré et étanche. La fonction Failsafe assure un arrêt immédiat en cas de défaillance. Une solution conçue pour les environnements hostiles, où la poussière et l'humidité mettent à rude épreuve les garnitures.
+
+————————————————————————————————————————
+
+Voilà pour cette actualité du Freinage du samedi 4 juillet 2026. Sources : Vehicle Dynamics International (général) et Dynamic Friction Company (DFC) et Advanced Braking Technology (ABT). On se retrouve à demain pour une nouvelle édition. Bonne journée à toutes et à tous.
